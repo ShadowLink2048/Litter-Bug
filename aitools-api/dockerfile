@@ -1,0 +1,17 @@
+FROM python:3.9-slim-buster
+
+RUN apt-get update && \
+    apt-get -qq -y install tesseract-ocr && \
+    apt-get -qq -y install libtesseract-dev
+
+WORKDIR /app
+
+EXPOSE 2000
+
+COPY requirements.txt .
+
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY . .
+
+CMD ["python", "server.py"]

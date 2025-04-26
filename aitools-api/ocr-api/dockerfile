@@ -1,0 +1,33 @@
+FROM python:3.11-slim
+
+# Install necessary dependencies
+RUN apt-get update && apt-get install -y \
+    wget \
+    unzip \
+    curl \
+    chromium \
+    chromium-driver \
+    && rm -rf /var/lib/apt/lists/*
+
+# Set environment variables
+ENV PIP_NO_CACHE_DIR=no \
+    PYTHONUNBUFFERED=1 \
+    DISPLAY=:99
+
+# Install Selenium
+RUN pip install --upgrade pip && \
+    pip install selenium
+
+# Copy the requirements file into the container
+COPY requirements.txt .
+
+# Install the required packages
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy the rest of the application code into the container
+COPY . .
+
+EXPOSE 4000
+
+# Default command
+CMD ["python", "scraper.py"]
