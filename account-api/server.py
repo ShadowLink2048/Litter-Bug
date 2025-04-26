@@ -84,7 +84,7 @@ def check_user_by_token(token):
     #find username with the associated token from logged_in
     for username, info in logged_in.items():
         if info['tokenid'] == token:
-            # Check if token has expired
+            # Check if the token has expired
             if check_expired_token(username):
                 return None
             
@@ -110,14 +110,14 @@ def userinfo():
         return jsonify({'error': 'Token expired, please log in again'}), 401
 
     try:
-        # Check if token is expired or invalid
+        # Check if the token is expired or invalid
         if logged_in[data['username']]['tokenid'] != data['tokenid']:
             return jsonify({'error': 'Invalid token, need to log in again'}), 401
         
         # Retrieve user information from the database
         user = collection.find_one({'username': data['username']})
         
-        # If user not found, return error message
+        # If user not found, return an error message
         if not user:
             return jsonify({'error': 'User not found'}), 404
         
@@ -140,23 +140,23 @@ def login():
         return jsonify({'error': 'Missing required inputs'}), 400
 
     try:
-        # Check if user exists
+        # Check if a user exists
         user = collection.find_one({'username': data['username']})
         print(user, flush=True)
 
-        # Check if passkey is correct
+        # Check if a passkey is correct
         print(data['passkey'], user['passkey'], flush=True)  # Debug statement to check passkey and stored hash
 
         if not check_hash_match(data['passkey'], user['passkey']):
             return jsonify({'error': 'Invalid username or passkey'}), 401
 
-        # Add user to logged in dictionary
+        # Add user to logged-in dictionary
         add_logged_in_user(data['username'])
 
         # Retrieve generated token
         generated_token = logged_in[data['username']]['tokenid']
         
-        # Return success message to user
+        # Return a success message to a user
         return jsonify({'success': "User will be logged in for 24 hours", 'tokenid': generated_token}), 201
     except (OperationFailure, ServerSelectionTimeoutError) as e:
         return jsonify({'error': str(e)}), 500
@@ -178,17 +178,17 @@ def signup():
         email_exists = collection.find_one({'email': data['email']}) if 'email' in data else None
         
         if user_exists or email_exists:
-            # If user exists, return error message
+            # If a user exists, return an error message
             return jsonify({'error': 'Username already exists'}), 409
         
-        # Check if passkey qualifies
+        # Check if the passkey qualifies
         if not isinstance(data['passkey'], str) or len(data['passkey']) < 8:
             return jsonify({'error': 'Passkey does not qualify. It must be a string with a minimum length of 8 characters'}), 401
 
         # hash the passcode
         hashed_passkey = hash_passkey(data['passkey'])
 
-        # Insert new user into the database
+        # Insert a new user into the database
         new_user = {
             'username': data['username'],
             'firstname': data.get('firstname', ''),  # Optional field, default to empty string if not provided
@@ -198,7 +198,7 @@ def signup():
         }
         collection.insert_one(new_user)
         
-        # Return success message to user
+        # Return a success message to user
         return jsonify({'success': f"{data['username']} must now log in"}), 201
     except (OperationFailure, ServerSelectionTimeoutError) as e:
         return jsonify({'error': str(e)}), 500
