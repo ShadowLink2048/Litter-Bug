@@ -9,7 +9,9 @@ import json
 
 from jan import *
 from description import *
+from answer import *
 
+import sys
 
 app = Flask(__name__)
 CORS(app)
@@ -24,7 +26,7 @@ app.config['SERVER_PORT'] = 2001
 
 
 @app.route('/classifygarbage', methods=['POST'])
-def ocr_text():
+def classify_garbage():
     if 'image' not in request.files:
         return jsonify({'error': 'No image file provided'}), 400
 
@@ -35,63 +37,27 @@ def ocr_text():
     try:
         filename = secure_filename(file.filename)
         filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        print(f"Saving file: {filepath}")  # Debug: Confirm file path
         file.save(filepath)
 
         # Perform OCR using pytesseract
         image = Image.open(filepath)
-        text = pytesseract.image_to_string(image)
 
-        # Clean up the uploaded file
-        os.remove(filepath)
 
-        # Use the OCR text to classify garbage
-        is_garbage = jan.is_garbage(text)
-        
-        garbage_type = None
-        product_name = None
-        is_recyclable = None
-        points = 0
+        # Generate description
+        description = generate_description(image)
+        print(f"Generated description: {description}")  # Debug: Log generated description
 
-        if is_garbage:
-            garbage_type = jan.get_type(text)
-            product_name = jan.get_product_name(text)
-            is_recyclable = False
-            points = 0
+        garbage = is_garbage(description)
 
-            if garbage_type == 'plastic':
-                is_recyclable = True
-                points = 5
-            elif garbage_type == 'metal':
-                is_recyclable = True
-                points = 8
-            elif garbage_type == 'glass':
-                is_recyclable = True
-            elif garbage_type == 'organic':
-                is_recyclable = False
-            elif garbage_type == 'wrapper':
-                is_recyclable = False
-            elif garbage_type == 'paper':
-                is_recyclable = True
-            elif garbage_type == 'other':
-                is_recyclable = False
-            else :
-                is_recyclable = False
-                garbage_type = 'other'
+        return jsonify({
+            'garbage': garbage,
+            'description': description
 
-        elif is_garbage == False:
-            garbage_type = False
-            product_name = None
-            is_recyclable = None
-
-            points = 0
-        
-
-        return jsonify({'garbage': is_garbage, 
-                        'recyclable': is_recyclable, 
-                        'type': garbage_type, 
-                        'name': product_name, 
-                        'points':points}), 200
+        }), 200
+    
     except Exception as e:
+        print(f"Error: {str(e)}")  # Debug: Log errors
         return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':

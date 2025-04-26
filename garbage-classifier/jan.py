@@ -52,12 +52,40 @@ def get_most_common_response(instructions, schema, num_attempts=1):
     
     return json.loads(most_common)
 
-def is_garbage(description):
+def recycle_can(description):
     try:
-        instructions = f': question: determine whether {str(description)}  is some kind of garbage or recycle item. Wrapper would be garbage. A car or a tree would not be. Return a boolean in the "garbage" key. No extra json'
+        instructions = f': question: determine whether phrase "{str(description)}" has a recycling can. Return a boolean in the "recycle" key. No extra json'
+        schema = '{"recycle": boolean}'
+        result = get_most_common_response(instructions, schema)
+        return result['json']['recycle'] if result else None
+    
+    except Exception as e:
+        print(f"Error in generate_related_query: {e}")
+        return None
+    
+    finally:
+        print("Finished processing generate_related_query")
+
+def garbage_can(description):
+    try:
+        instructions = f': question: determine whether phrase "{str(description)}" has a garbage can. Return a boolean in the "garbage" key. No extra json'
         schema = '{"garbage": boolean}'
         result = get_most_common_response(instructions, schema)
         return result['json']['garbage'] if result else None
+    
+    except Exception as e:
+        print(f"Error in generate_related_query: {e}")
+        return None
+    
+    finally:
+        print("Finished processing generate_related_query")
+
+def is_garbage(description):
+    try:
+        instructions = f': question: I found {description} on the street, should i throw it away? Return a boolean in the "decision" key.'
+        schema = '{"decision": boolean}'
+        result = get_most_common_response(instructions, schema)
+        return result['json']['decision'] if result else None
     
     except Exception as e:
         print(f"Error in generate_related_query: {e}")
@@ -111,7 +139,6 @@ def get_product_name(description):
 # Example usage
 if __name__ == "__main__":
     query = "Keloggs cereal treat Nutrition Facts blah blah blah "
-    
     name = get_product_name(query)
     type = get_type(query)
     
