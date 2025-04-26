@@ -1,1 +1,53 @@
-[]
+[
+    {
+        "_id": "680d367610c842148369a252",
+        "username": "player1",
+        "recycle_coins": 0,
+        "trash_coins": 0,
+        "waste_coins": 0,
+        "accessories": {
+            "hat": null,
+            "shirt": null,
+            "pants": null,
+            "shoes": null,
+            "hand_left": null,
+            "hand_right": null
+        },
+        "steps": 0,
+        "created_at": "2025-04-26T19:39:34.059000"
+    },
+    {
+        "_id": "680d36bc6e549b8053bacba5",
+        "username": "player2",
+        "recycle_coins": 0,
+        "trash_coins": 0,
+        "waste_coins": 0,
+        "accessories": {
+            "hat": null,
+            "shirt": null,
+            "pants": null,
+            "shoes": null,
+            "hand_left": null,
+            "hand_right": null
+        },
+        "steps": 0,
+        "created_at": "2025-04-26T19:40:44.526000"
+    },
+    {
+        "_id": "680d36c929e23f5f3998b2d4",
+        "username": "player3",
+        "recycle_coins": 0,
+        "trash_coins": 0,
+        "waste_coins": 0,
+        "accessories": {
+            "hat": null,
+            "shirt": null,
+            "pants": null,
+            "shoes": null,
+            "hand_left": null,
+            "hand_right": null
+        },
+        "steps": 0,
+        "created_at": "2025-04-26T19:40:57.581000"
+    }
+]
