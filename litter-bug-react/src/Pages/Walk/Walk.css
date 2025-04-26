@@ -1,0 +1,75 @@
+/* src/pages/Walk.css */
+body, html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    overflow: hidden; /* Prevent scrolling */
+  }
+  
+  .walk-page {
+    position: relative;
+    height: 100%;
+    width: 100%;
+  }
+  
+  .walk-page .leaflet-container {
+    z-index: 1; /* Lower z-index for the map */
+  }
+  
+  .quit-button, .camera-button, .report-button, .walk-image {
+    position: absolute;
+    z-index: 2; /* Higher z-index to make them appear in front of the map */
+  }
+  
+  .quit-button {
+    top: 20px;
+    right: 20px;
+    background-color: red;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    font-size: 24px;
+    cursor: pointer;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.4);
+  }
+  
+  .camera-button {
+    bottom: 80px;
+    left: 20px;
+    background-color: white;
+    color: #333;
+    border: none;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    font-size: 24px;
+    cursor: pointer;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.4);
+  }
+  
+  .report-button {
+    bottom: 140px;
+    left: 20px;
+    background-color: white;
+    color: #333;
+    border: none;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    font-size: 16px;
+    cursor: pointer;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.4);
+  }
+  
+  .walk-image {
+    bottom: 20px;
+    right: 20px;
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 10px;
+    z-index: 3; /* Highest z-index for the image */
+  }
+  

@@ -1,9 +1,9 @@
 // src/pages/Home.js
 import { usePage } from '../../PageContext';
 import { useState } from 'react';
-import './Home.css';
+import './Friends.css';
 
-function HomePage() {
+function FriendsPage() {
   const { setCurrentPage } = usePage();
   const [steps, setSteps] = useState(0); // Example step counter
   const [coins, setCoins] = useState(0);
@@ -57,20 +57,23 @@ function HomePage() {
         </button>
       </div>
 
-      
+      {/* Quit button hidden */}
+      <button className="quit-button" onClick={() => setCurrentPage('login')}>
+        😞 Quit 
+      </button>
 
       <button className="settings-button" onClick={() => setCurrentPage('settings')}>
         ⚙️
       </button>
       
-      <button className="about-button" onClick={() => handleAboutClick()}>
+      <button className="about-button" onClick={() => setCurrentPage('about')}>
         ❓
       </button>
-      
+
 
 
     </div>
   );
 }
 
-export default HomePage;
+export default FriendsPage;

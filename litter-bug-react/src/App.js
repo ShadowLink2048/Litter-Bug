@@ -9,6 +9,7 @@ import SettingsPage from './Pages/Settings/Settings.js';
 import SignupPage from './Pages/Signup/Signup.js';
 import LoginPage from './Pages/Login/Login.js';
 import WalkPage from './Pages/Walk/Walk.js';
+import FriendsPage from './Pages/Friends/Friends.js'
 
 
 
@@ -30,6 +31,8 @@ function PageSwitcher() {
       return <SignupPage />;
     case 'walk':
       return <WalkPage />;
+    case 'friends':
+      return <FriendsPage />;
     default:
       return <div>404: Page not found</div>;
   }
