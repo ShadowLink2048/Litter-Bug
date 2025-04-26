@@ -1,15 +1,20 @@
 from pymongo import MongoClient
 from pymongo.errors import DuplicateKeyError
-import datetime
 import json
+import datetime
 
-# Connect to MongoDB
+# MongoDB connection
 client = MongoClient("mongodb://localhost:27017/")
-db = client["litter_bug_db"]  # Correct DB name
+db = client["litter_bug_db"]
 
-# ---------------------------
-# Insert a New User (No Password)
-# ---------------------------
+# 🟢 Custom JSON Encoder to handle datetime objects
+class MongoJSONEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, datetime.datetime):
+            return obj.isoformat()  # Convert datetime to ISO 8601 string
+        return super().default(obj)
+
+# 🟠 Insert a new user into the litter_bug_db Users collection
 def insert_user(username):
     user_doc = {
         "username": username,
@@ -25,65 +30,33 @@ def insert_user(username):
             "hand_right": None
         },
         "steps": 0,
-        "created_at": datetime.datetime.utcnow()
+        "created_at": datetime.datetime.now(datetime.UTC)  # Timezone-aware datetime
     }
+
     try:
         result = db.Users.insert_one(user_doc)
         print(f"✅ New user '{username}' added with ID: {result.inserted_id}")
     except DuplicateKeyError:
         print(f"⚠️ Username '{username}' already exists. Choose a different username.")
 
-# ---------------------------
-# Insert a New Bin
-# ---------------------------
-def insert_bin(longitude, latitude, bin_type):
-    bin_doc = {
-        "longitude": float(longitude),
-        "latitude": float(latitude),
-        "type": str(bin_type)
-    }
-    result = db.Bins.insert_one(bin_doc)
-    print(f"✅ New bin added with ID: {result.inserted_id}")
-
-# ---------------------------
-# Insert a New Trash Item
-# ---------------------------
-def insert_trash(longitude, latitude, trash_type, dropped_by=None):
-    trash_doc = {
-        "longitude": float(longitude),
-        "latitude": float(latitude),
-        "type": str(trash_type),
-        "dropped_by": dropped_by,
-        "picked_up_by": None,
-        "is_collected": False,
-        "timestamp": datetime.datetime.utcnow()
-    }
-    result = db.Trash.insert_one(trash_doc)
-    print(f"✅ New trash item added with ID: {result.inserted_id}")
-
-
+# 🟣 Retrieve all users from the Users collection
 def get_all_users():
     users_cursor = db.Users.find()
-
-    # Prepare the data for JSON dumping (convert ObjectId to string)
     users_list = []
     for user in users_cursor:
-        user["_id"] = str(user["_id"])  # ObjectId needs to be string for JSON
+        user["_id"] = str(user["_id"])  # Convert ObjectId to string for JSON safety
         users_list.append(user)
-
     return users_list
 
-
+# 🟡 Export all users to a JSON file (fixed datetime issue)
 def export_users_to_json(filepath="users_export.json"):
     users = get_all_users()
 
-    # Write the users list to a JSON file
     with open(filepath, "w") as f:
-        json.dump(users, f, indent=4)
+        json.dump(users, f, indent=4, cls=MongoJSONEncoder)
 
     print(f"✅ All users exported to {filepath}")
 
-
-# Example usage:
+# Optional: manual test to export users
 if __name__ == "__main__":
     export_users_to_json()

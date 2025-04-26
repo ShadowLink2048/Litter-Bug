@@ -87,3 +87,16 @@ create_collection_with_schema("Trash", trash_schema)
 # Unique index for username (duplicate prevention)
 db.Users.create_index("username", unique=True)
 print("✅ Unique index on 'username' created.")
+
+
+# Ensure Users collection exists
+create_collection_with_schema("Users", users_schema)
+
+# 🟢 Create 2dsphere indexes for geospatial queries
+db.Bins.create_index([("location", "2dsphere")])
+print("✅ 2dsphere index created on Bins.location")
+
+db.Trash.create_index([("location", "2dsphere")])
+print("✅ 2dsphere index created on Trash.location")
+
+
