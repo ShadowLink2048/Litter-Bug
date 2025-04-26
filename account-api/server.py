@@ -80,6 +80,24 @@ def check_expired_token(username):
         return True
     return False
 
+def check_user_by_token(token):
+    #find username with the associated token from logged_in
+    for username, info in logged_in.items():
+        if info['tokenid'] == token:
+            # Check if token has expired
+            if check_expired_token(username):
+                return None
+            
+            #Fetch user from the database
+            user = collection.find_one({'username': username})
+            if user:
+                user.pop('_id', None)
+                user.pop('passkey', None)
+                return user
+    return None
+
+
+
 @app.route('/userinfo', methods=['POST'])
 def userinfo():
     data = request.get_json()
