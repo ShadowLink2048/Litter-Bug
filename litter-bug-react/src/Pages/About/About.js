@@ -1,5 +1,6 @@
 // src/pages/AboutPage.js
 import { usePage } from '../../PageContext';
+import './About.css';
 
 function AboutPage() {
   const { setCurrentPage } = usePage();
