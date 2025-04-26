@@ -49,10 +49,37 @@ def classify_garbage():
         print(f"Generated description: {description}")  # Debug: Log generated description
 
         garbage = is_garbage(description)
+        recyclable = is_recyclable(description) 
+        garbage_type = get_type(description)
+
+        points = 0
+    
+        if garbage:
+            if garbage_type == "bottle":
+                points = 10
+            elif garbage_type == "can":
+                points = 20
+            elif garbage_type == "wrapper":
+                points = 20
+            elif garbage_type == "paper":
+                points = 20
+            elif garbage_type == "plastic":
+                points = 15
+            elif garbage_type == "glass":
+                points = 15
+            elif garbage_type == "metal":
+                points = 15
+            elif garbage_type == "organic":
+                points = 10
+            else:
+                points = 5
 
         return jsonify({
             'garbage': garbage,
-            'description': description
+            'description': description,
+            'recyclable': recyclable,
+            'type': garbage_type,
+            'points': points
 
         }), 200
     

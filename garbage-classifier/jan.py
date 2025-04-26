@@ -96,10 +96,10 @@ def is_garbage(description):
 
 def is_recyclable(description):
     try:
-        instructions = f': question: determine whether  {str(description)}  is recyclable. Return a boolean in the "recycle" key. No extra json'
-        schema = '{"recycle": boolean}'
+        instructions = f': question: should i recycle a {description}. Return a boolean in the "decision" key. No extra json'
+        schema = '{"decision": boolean}'
         result = get_most_common_response(instructions, schema)
-        return result['json']['recycle'] if result else None
+        return result['json']['decision'] if result else None
     
     except Exception as e:
         print(f"Error in generate_related_query: {e}")
@@ -110,7 +110,7 @@ def is_recyclable(description):
 
 def get_type(description):
     try:
-        instructions = f': question: classify {str(description)} as either plastic, metal, glass, organic, or other. Return a string in the "type" key of one of those five. No extra json, no more information than exactly requested.'
+        instructions = f': question: classify {str(description)} as either bottle, can, wrapper, paper, or other. Return a string in the "type" key of one of those five. No extra json, no more information than exactly requested.'
         schema = '{"type": string}'
         result = get_most_common_response(instructions, schema)
         return result['json']['type'] if result else None
