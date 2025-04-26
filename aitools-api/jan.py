@@ -1,6 +1,11 @@
 import requests
 import json
 
+
+
+
+
+
 def send_request_to_chat_with_schema(instructions, schema):
     url = "http://127.0.0.1:2000/chat/json"  # Replace with the actual server URL if different
     headers = {
@@ -14,7 +19,7 @@ def send_request_to_chat_with_schema(instructions, schema):
     try:
         response = requests.post(url, headers=headers, data=json.dumps(payload))
         response.raise_for_status()  # Raise an exception for HTTP errors
-        print("Response JSON:", response.json())
+        #print("Response JSON:", response.json())
         return response.json()
     
     except requests.exceptions.RequestException as e:
@@ -120,10 +125,52 @@ def generate_related_query(search, last_search, current_topic):
     finally:
         print("Finished processing generate_related_query")
 
+def is_recyclable(description):
+    try:
+        instructions = f': question: determine whether  {str(description)}  is recyclable. Return a boolean in the "recycle" key. No extra json'
+        schema = '{"recycle": boolean}'
+        result = get_most_common_response(instructions, schema)
+        return result['json']['recycle'] if result else None
+    
+    except Exception as e:
+        print(f"Error in generate_related_query: {e}")
+        return None
+    
+    finally:
+        print("Finished processing generate_related_query")
+
+def get_type(description):
+    try:
+        instructions = f': question: classify {str(description)} as either plastic, metal, glass, organic, or other. Return a string in the "type" key of one of those five. No extra json, no more information than exactly requested.'
+        schema = '{"type": string}'
+        result = get_most_common_response(instructions, schema)
+        return result['json']['type'] if result else None
+    
+    except Exception as e:
+        print(f"Error in generate_related_query: {e}")
+        return None
+    
+    finally:
+        print("Finished processing generate_related_query")
+
+def get_product_name(description):
+    try:
+        instructions = f': question: determine the product name from {str(description)}  is. Return a string in the "product" key. No extra json'
+        schema = '{"product": string}'
+        result = get_most_common_response(instructions, schema)
+        return result['json']['product'] if result else None
+    
+    except Exception as e:
+        print(f"Error in generate_related_query: {e}")
+        return None
+    
+    finally:
+        print("Finished processing generate_related_query")
+
 # Example usage
 if __name__ == "__main__":
-    
-    
-    print(generate_related_query("how to string a guitar", "how to tune a guitar", "guitar maintenance"))
-    
-    
+    query = "Keloggs cereal treat Nutrition Facts blah blah blah "
+    print(get_product_name(query))
+    print(get_type(query))
+    print(is_recyclable(query))
+

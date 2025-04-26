@@ -117,15 +117,11 @@ def chat_raw():
 @app.route('/chat/json', methods=['POST'])
 def chat_with_schema():
 
-
-
-
-
     data = request.get_json()
     if 'instructions' not in data or 'schema' not in data:
         return jsonify({'error': 'Both "message" and "schema" fields are required'}), 400
 
-    jan_url = "http://host.docker.internal:1337/v1/chat/completions"
+    jan_url = "http://localhost:1337/v1/chat/completions"
 
     headers = {
         "Content-Type": "application/json"
