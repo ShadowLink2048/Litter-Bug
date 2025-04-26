@@ -25,6 +25,8 @@ function PageSwitcher() {
       return <CustomizePage />;
     case 'leaderboard':
       return <LeaderboardPage />;
+    case 'settings':
+      return <SettingsPage />;
     case 'login':
       return <LoginPage />;
     case 'signup':
