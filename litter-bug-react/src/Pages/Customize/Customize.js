@@ -1,5 +1,6 @@
-// src/pages/AboutPage.js
+// src/pages/Customize.js
 import { usePage } from '../../PageContext';
+import './Customize.css';
 
 function CustomizePage() {
   const { setCurrentPage } = usePage();

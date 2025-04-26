@@ -1,4 +1,4 @@
-// src/pages/AboutPage.js
+// src/pages/About.js
 import { usePage } from '../../PageContext';
 import './About.css';
 

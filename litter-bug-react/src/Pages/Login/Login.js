@@ -1,7 +1,8 @@
-// src/pages/AboutPage.js
+// src/pages/Login.js
 import { usePage } from '../../PageContext';
+import './Login.css';
 
-function AboutPage() {
+function LoginPage() {
   const { setCurrentPage } = usePage();
 
   return (
@@ -14,4 +15,4 @@ function AboutPage() {
   );
 }
 
-export default AboutPage;
+export default LoginPage;
