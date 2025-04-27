@@ -11,6 +11,15 @@ from login_utils_db import hash_passkey, check_hash_match, add_logged_in_user, l
 import subprocess
 import os
 
+
+from pymongo import MongoClient
+
+client = MongoClient('mongodb://localhost:27017/')
+db = client['litter_bug_db']
+users_collection = db['Users']  # <---- THIS is the missing line
+
+
+
 DB_SETUP_FLAG = "DB_SETUP_COMPLETE.flag"
 
 def run_db_setup():
@@ -261,9 +270,37 @@ def add_trash():
         return jsonify({'error': str(e)}), 500
 
 
+# Leaderboard Endpoint
+@app.route('/api/users/top-trash-scores', methods=['GET'])
+def get_top_trash_scores():
+    try:
+        # Query top 10 users by trash_coins
+        top_users = users_collection.find(
+            {}, {"username": 1, "trash_coins": 1, "_id": 0}
+        ).sort("trash_coins", -1).limit(10)
+
+        # Format the response
+        result = [
+            {
+                "username": user.get("username"),
+                "trash_coins": user.get("trash_coins", 0)
+            }
+            for user in top_users
+        ]
+
+        return jsonify({
+            "leaderboard": result,
+            "message": "Top 10 trash token scores"
+        }), 200
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
 
 # -----------------------------
 # Run the server
 # -----------------------------
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=3001)
+    app.run(debug=True, host='0.0.0.0', port=5000)
+#score board info
+#http://localhost:5000/api/users/top-trash-scores
