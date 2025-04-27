@@ -110,7 +110,7 @@ def is_recyclable(description):
 
 def get_type(description):
     try:
-        instructions = f': question: classify {str(description)} as either bottle, can, wrapper, paper, or other. Return a string in the "type" key of one of those five. No extra json, no more information than exactly requested.'
+        instructions = f': question: classify {str(description)} as either bottle, can, wrapper, paper, or "other". Return a string in the "type" key of one of those five. If unknown, type other. No extra json.'
         schema = '{"type": string}'
         result = get_most_common_response(instructions, schema)
         return result['json']['type'] if result else None
@@ -123,14 +123,52 @@ def get_type(description):
         print("Finished processing generate_related_query")
 
 def get_brand(description):
-    try:
-        instructions = f': question: determine brand of {str(description)}. Return a string in the "brand" key. If no brand, set to "none". No extra json, no more information than exactly requested.'
-        schema = '{"brand": string}'
-        result = get_most_common_response(instructions, schema)
+    while(1):
+        try:
+            instructions = f': Return a string in the "brand" key. If no brand, set to "none". No extra json. question: determine brand of {str(description)}.'
+            schema = '{"brand": string}'
+            result = get_most_common_response(instructions, schema)
+            
+            if result['json']['brand'].lower() == 'none':
+                pass
+            else:
+                return result['json']['brand']
         
-        if result['json']['type'].lower() == 'none':
+        except Exception as e:
+            print(f"Error in generate_related_query: {e}")
             return None
-        return result['json']['type'] if result else None
+        
+        finally:
+            print("Finished processing generate_related_query")
+
+def get_product_name(description):
+    while(1):
+        try:
+            instructions = f'Product name. Return a string in the "name" key. No extra json. : question: determine the product name from {str(description)}'
+            schema = '{"name": string}'
+            result = get_most_common_response(instructions, schema)
+            if result['json']['name'] != None:
+                return result['json']['name']
+            else:
+                pass # keep looping, until not None
+        
+        except Exception as e:
+            print(f"Error in generate_related_query: {e}")
+            return None
+        
+        finally:
+            print("Finished processing generate_related_query")
+
+
+def is_can_present(description):
+    try:
+        instructions = f': question: is something being thrown away in the sentence : {str(description)} : anything thrown away? : Return a string in the "can" key.'
+        schema = '{"bin": true/false}'
+        result = get_most_common_response(instructions, schema)
+        if result['json']['bin'] != None:
+            return result['json']['bin']
+        else:
+            pass # keep looping, until not None
     
     except Exception as e:
         print(f"Error in generate_related_query: {e}")
@@ -139,14 +177,14 @@ def get_brand(description):
     finally:
         print("Finished processing generate_related_query")
 
-def get_product_name(description):
+def get_thrown_away(description):
     while(1):
         try:
-            instructions = f': question: determine the product name from {str(description)}  is. Return a string in the "product" key. No extra json'
-            schema = '{"product": string}'
+            instructions = f': question:  what  is being thrown away in the sentence : what brand being thrown away? Return a string in the "brand" and "type" keys. Type should be bottle, can, paper, or other. No extra json. {str(description)} '
+            schema = '{"brand": string}'
             result = get_most_common_response(instructions, schema)
-            if result['json']['product'] != None:
-                return result['json']['product']
+            if result['json']['thrownaway'] != None:
+                return result['json']['thrownaway']
             else:
                 pass # keep looping, until not None
         
@@ -159,14 +197,17 @@ def get_product_name(description):
 
 # Example usage
 if __name__ == "__main__":
-    query = "pepsi pepsi soda can"
+    query = "a person throwing away a mountain dew bottle in a blue recepticle"
 
     name = get_product_name(query)
     brand = get_brand(query)
     recycle = is_recyclable(query)
     type = get_type(query)
 
-    print(name, type)
+    can = is_can_present(query)
+    throw = get_thrown_away(query)
+
+    print(name, brand, type, can, throw)
     
 
 
