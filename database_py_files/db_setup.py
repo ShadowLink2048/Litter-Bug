@@ -100,3 +100,25 @@ db.Trash.create_index([("location", "2dsphere")])
 print("✅ 2dsphere index created on Trash.location")
 
 
+# Connect to login_db
+client = MongoClient("mongodb://localhost:27017/")
+login_db = client["login_db"]
+
+# Correct login users schema
+login_users_schema = {
+    "$jsonSchema": {
+        "bsonType": "object",
+        "required": ["username", "passkey"],  # <- FIXED HERE
+        "properties": {
+            "username": {"bsonType": "string"},
+            "passkey": {"bsonType": "string"},
+            "email": {"bsonType": "string"},
+            "firstname": {"bsonType": "string"},
+            "lastname": {"bsonType": "string"}
+        }
+    }
+}
+
+# Apply the corrected schema
+login_db.command("collMod", "Users", validator=login_users_schema)
+print("✅ Updated schema validator on login_db.Users to use 'username'.")

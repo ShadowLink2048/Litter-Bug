@@ -9,7 +9,7 @@ db = client["login_db"]  # Your new login database
 users_schema = {
     "$jsonSchema": {
         "bsonType": "object",
-        "required": ["id", "passkey"],
+        "required": ["username", "passkey"],
         "properties": {
             "id": {"bsonType": "string"},  # Change to "int" if IDs are numeric
             "passkey": {"bsonType": "string"}  # Stored exactly as provided
