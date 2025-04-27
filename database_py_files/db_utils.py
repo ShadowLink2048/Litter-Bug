@@ -57,7 +57,13 @@ def get_all_users():
     users_list = []
     for user in users_cursor:
         user["_id"] = str(user["_id"])  # Convert ObjectId to string for JSON safety
-        user["created_at"] = user["created_at"].isoformat()  # Ensure datetime is converted
+
+        # Ensure created_at exists before accessing it
+        if "created_at" in user:
+            user["created_at"] = user["created_at"].isoformat()  # Ensure datetime is converted
+        else:
+            user["created_at"] = None  # Or assign a default value (e.g., None)
+
         users_list.append(user)
     return users_list
 
