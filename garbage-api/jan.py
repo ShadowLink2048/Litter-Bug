@@ -122,12 +122,15 @@ def get_type(description):
     finally:
         print("Finished processing generate_related_query")
 
-def get_product_name(description):
+def get_brand(description):
     try:
-        instructions = f': question: determine the product name from {str(description)}  is. Return a string in the "product" key. No extra json'
-        schema = '{"product": string}'
+        instructions = f': question: determine brand of {str(description)}. Return a string in the "brand" key. If no brand, set to "none". No extra json, no more information than exactly requested.'
+        schema = '{"brand": string}'
         result = get_most_common_response(instructions, schema)
-        return result['json']['product'] if result else None
+        
+        if result['json']['type'].lower() == 'none':
+            return None
+        return result['json']['type'] if result else None
     
     except Exception as e:
         print(f"Error in generate_related_query: {e}")
@@ -136,11 +139,34 @@ def get_product_name(description):
     finally:
         print("Finished processing generate_related_query")
 
+def get_product_name(description):
+    while(1):
+        try:
+            instructions = f': question: determine the product name from {str(description)}  is. Return a string in the "product" key. No extra json'
+            schema = '{"product": string}'
+            result = get_most_common_response(instructions, schema)
+            if result['json']['product'] != None:
+                return result['json']['product']
+            else:
+                pass # keep looping, until not None
+        
+        except Exception as e:
+            print(f"Error in generate_related_query: {e}")
+            return None
+        
+        finally:
+            print("Finished processing generate_related_query")
+
 # Example usage
 if __name__ == "__main__":
-    query = "Keloggs cereal treat Nutrition Facts blah blah blah "
+    query = "pepsi pepsi soda can"
+
     name = get_product_name(query)
+    brand = get_brand(query)
+    recycle = is_recyclable(query)
     type = get_type(query)
+
+    print(name, type)
     
 
 
