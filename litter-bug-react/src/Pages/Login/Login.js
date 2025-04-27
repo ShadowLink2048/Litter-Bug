@@ -23,9 +23,10 @@ function LoginPage() {
 
   return (
     <div className="login-page">
-      <div className="logo">Litter Bug</div>
+      <div className="logo">Litter-Bug.ai</div>
       
       <div className="login-box">
+        <img src="animation.gif" alt="Login gif" style={{ width: '200px', height: '150px' }} />        
         <h2>Log In</h2>
         <input
           type="text"
