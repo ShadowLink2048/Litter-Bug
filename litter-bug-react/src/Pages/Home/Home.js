@@ -15,7 +15,14 @@ function HomePage() {
   };
 
   const handleAboutClick = () => {
-    alert("About message here")
+    alert(`🐞 Welcome to Litter-Bug!
+
+Clean up your neighborhood — one piece of trash at a time.
+Track down litter, find the right bins, and help keep your world looking awesome!
+
+🎉 Earn coins, customize your look, and level up as you go.
+
+🌎 It’s your planet. Let’s clean it up — and have some fun while we’re at it!`)
   };
 
   return (
