@@ -7,6 +7,27 @@ from geo_utils import get_bins_within_radius, get_trash_within_radius
 from login_utils_db import get_user_profile, game_db
 from login_utils_db import hash_passkey, check_hash_match, add_logged_in_user, logged_in, collection
 
+
+import subprocess
+import os
+
+DB_SETUP_FLAG = "DB_SETUP_COMPLETE.flag"
+
+def run_db_setup():
+    try:
+        print("🔧 Running database setup script...")
+        subprocess.run(["python", "setup_all.py"], check=True)  # Since it's in the same folder
+        with open(DB_SETUP_FLAG, "w") as flag_file:
+            flag_file.write("Database setup completed.")
+        print("✅ Database setup completed successfully.")
+    except subprocess.CalledProcessError as e:
+        print("❌ Database setup failed:", e)
+
+# Only run setup if not already done
+if not os.path.exists(DB_SETUP_FLAG):
+    run_db_setup()
+
+
 app = Flask(__name__)
 CORS(app)
 
