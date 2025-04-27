@@ -1,0 +1,125 @@
+/* GarbagePhoto.css */
+.camera-button {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background-color: #ff8c00;
+    border: none;
+    color: white;
+    font-size: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.camera-button:hover {
+    background-color: #ffa500;
+}
+
+/* Circular Home Button */
+.home-button {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background-color: #4CAF50;
+    border: none;
+    color: white;
+    font-size: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    z-index: 10;
+}
+
+.home-button:hover {
+    background-color: #45a049;
+}
+
+/* Modal Style */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: flex-start; /* Align to top instead of center */
+    padding-top: 100px; /* Push it down a bit */
+    z-index: 20000;
+}
+
+
+.modal-content {
+    background: white;
+    padding: 30px;
+    border-radius: 8px;
+    text-align: center;
+    min-width: 300px;
+}
+
+.modal input {
+    margin-top: 10px;
+    padding: 10px;
+    font-size: 16px;
+    border: 2px solid #ccc;
+    border-radius: 4px;
+}
+/* GarbagePhoto.css */
+
+/* Full-screen Image Container */
+.image-container {
+    position: fixed; /* Fixed to take the whole screen */
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(0, 0, 0, 0.7); /* Dark overlay for image */
+    z-index: 9999;
+}
+
+.captured-image {
+    width: 100%; /* Make the image stretch across the whole screen */
+    height: 100%; /* Make the image stretch across the whole screen */
+    object-fit: cover; /* Maintain aspect ratio while covering entire area */
+    opacity: 0.6; /* Greyscale effect */
+    filter: grayscale(100%);
+}
+
+
+
+.leave-button {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background-color: rgb(255, 255, 255);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    font-size: 24px;
+    cursor: pointer;
+    box-shadow: 2px 2px 5px rgba(0,0,0,0.4);
+  }
+  
+  .loading-image {
+    position: absolute;
+    top: 40%; /* Move it a little higher */
+    left: 50%;
+    width: 300px;
+    height: 400px;
+    transform: translate(-50%, -50%);
+    z-index: 10000;
+}

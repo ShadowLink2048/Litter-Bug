@@ -12,6 +12,9 @@ import WalkPage from './Pages/Walk/Walk.js';
 import FriendsPage from './Pages/Friends/Friends.js'
 
 
+import ThrowawayPhotoPage from './Pages/ThrowawayPhoto/ThrowawayPhoto.js'
+import GarbagePhotoPage from './Pages/GarbagePhoto/GarbagePhoto.js';
+
 
 function PageSwitcher() {
   const { currentPage } = usePage();
@@ -35,6 +38,10 @@ function PageSwitcher() {
       return <WalkPage />;
     case 'friends':
       return <FriendsPage />;
+    case 'garbagephoto':
+      return <GarbagePhotoPage />;
+    case 'throwawayphoto':
+        return <ThrowawayPhotoPage />;
     default:
       return <div>404: Page not found</div>;
   }

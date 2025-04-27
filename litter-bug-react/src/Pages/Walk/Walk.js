@@ -16,12 +16,14 @@ Track your progress as you walk and clean up the neighborhood. Take pictures of 
 
   const handleTakePickUpPhoto = () => {
     alert("📸 Picture of picking up garbage taken!");
-    setCoins(coins + 10); // Example increment for taking a photo
+    setCurrentPage('garbagephoto');
   };
 
   const handleTakeThrowAwayPhoto = () => {
     alert("📸 Picture of throwing away garbage taken!");
     setCoins(coins + 10); // Example increment for taking a photo
+    setCurrentPage('throwawayphoto');
+
   };
 
   return (
