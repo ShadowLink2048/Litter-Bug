@@ -135,6 +135,10 @@ def login():
 
     add_logged_in_user(username)
     token = logged_in[username]['tokenid']
+
+    # 🔥 ADD THIS LINE to auto-create the profile:
+    get_user_profile(username)
+
     return jsonify({'success': "User logged in", 'tokenid': token}), 201
 
 # -----------------------------
@@ -217,14 +221,14 @@ def add_trash():
     if trash_type not in ['recycle', 'trash']:
         return jsonify({'error': 'Invalid type. Must be "recycle" or "trash"'}), 400
 
-    from datetime import datetime
+    from datetime import datetime, timezone
 
     trash_doc = {
         "longitude": lon,
         "latitude": lat,
         "type": trash_type,
         "is_collected": False,  # Default value
-        "timestamp": datetime.utcnow(),  # Current UTC time
+        "timestamp": datetime.now(timezone.utc),  # Current UTC time
         "dropped_by": username,  # Optional, but helpful!
         "picked_up_by": None  # Not picked up yet
     }
