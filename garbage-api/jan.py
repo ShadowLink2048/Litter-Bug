@@ -123,23 +123,25 @@ def get_type(description):
         print("Finished processing generate_related_query")
 
 def get_brand(description):
-    while(1):
+    while True:
         try:
             instructions = f': Return a string in the "brand" key. If no brand, set to "none". No extra json. question: determine brand of {str(description)}.'
             schema = '{"brand": string}'
             result = get_most_common_response(instructions, schema)
             
-            if result['json']['brand'].lower() == 'none':
-                pass
+            brand = result['json']['brand'].strip()
+            if brand.lower() == 'none':
+                return None
             else:
-                return result['json']['brand']
-        
+                return brand.split()[0]  # Return first word only
+
         except Exception as e:
-            print(f"Error in generate_related_query: {e}")
+            print(f"Error in get_brand: {e}")
             return None
-        
+
         finally:
-            print("Finished processing generate_related_query")
+            print("Finished processing get_brand")
+
 
 def get_product_name(description):
     while(1):
@@ -162,7 +164,10 @@ def get_product_name(description):
 
 def is_can_present(description):
     try:
-        instructions = f': question: is something being thrown away in the sentence : {str(description)} : anything thrown away? : Return a string in the "can" key.'
+        instructions = f'''
+                Is something being thrown away? :   
+                Description: {str(description)}
+            '''
         schema = '{"bin": true/false}'
         result = get_most_common_response(instructions, schema)
         if result['json']['bin'] != None:
@@ -195,9 +200,43 @@ def get_thrown_away(description):
         finally:
             print("Finished processing generate_related_query")
 
+def answer_yes_no(description): 
+    try:
+        instructions = f':  Put in "answer" key json. No extra json. question:  is it yes or no? true for yes, false for no. {str(description)} '
+        schema = '{"answer": boolean}'
+        result = get_most_common_response(instructions, schema)
+        if result['json']['answer'] != None:
+            return result['json']['answer']
+        else:
+            pass # keep looping, until not None
+        
+    except Exception as e:
+        print(f"Error in generate_related_query: {e}")
+        return None
+    
+    finally:
+        print("Finished processing generate_related_query")
+
+def answer_string(description): 
+    try:
+        instructions = f':  Put in "answer" key json. No extra json. question: what is the answer given? : string {str(description)} '
+        schema = '{"answer": string}'
+        result = get_most_common_response(instructions, schema)
+        if result['json']['answer'] != None:
+            return result['json']['answer']
+        else:
+            pass # keep looping, until not None
+        
+    except Exception as e:
+        print(f"Error in generate_related_query: {e}")
+        return None
+    
+    finally:
+        print("Finished processing generate_related_query")
+
 # Example usage
 if __name__ == "__main__":
-    query = "a person throwing away a mountain dew bottle in a blue recepticle"
+    query = " a person putting a can of pepsi on a cooler"
 
     name = get_product_name(query)
     brand = get_brand(query)

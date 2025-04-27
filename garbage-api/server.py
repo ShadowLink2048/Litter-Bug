@@ -41,11 +41,55 @@ def add_player(player_id):
 def has_item(player_id, type, brand):
     # If the player exists
     if player_id in players:
+        # First check if the player has an item with the same brand
+        for item in players[player_id]:
+            if item['brand'] == brand:
+                return True  # Player already has the item with the same brand
+        # If no brand match, check if the player has an item with the same type
+        for item in players[player_id]:
+            if item['type'] == type:
+                return True  # Player already has the item with the same type
+    return False  # Player doesn't have the item
+
+
+# Function to get if a player already has an item with the same type and brand
+def get_item(player_id, type, brand):
+    # If the player exists
+    if player_id in players:
         # Loop through the player's items
         for item in players[player_id]:
-            if item['type'] == type and item['brand'] == brand:
-                return True  # Player already has the item with the same type and brand
-    return False  # Player doesn't have the item
+            # First check if the item brand matches
+            if item['brand'] == brand:
+                return item  # Return the item if the brand matches
+        # If no brand match, check if the type matches
+        for item in players[player_id]:
+            if item['type'] == type:
+                return item  # Return the item if the type matches
+    return None  # If not found, return None
+
+# Function to delete if a player already has an item with the same type and brand
+def delete_item(player_id, type, brand):
+    # If the player exists
+    if player_id in players:
+        # First, attempt to delete an item with the matching brand
+        for i, item in enumerate(players[player_id]):
+            if item['brand'] == brand:
+                del players[player_id][i]  # Delete the item if the brand matches
+                return True
+        # If no brand match, attempt to delete an item with the matching type
+        for i, item in enumerate(players[player_id]):
+            if item['type'] == type:
+                del players[player_id][i]  # Delete the item if the type matches
+                return True
+    return False  # Return False if no matching item is found
+
+def add_item_to_player(player_id, type, brand, points):
+    # If the player exists, add the new item
+    if player_id in players:
+        players[player_id].append({'type': type, 'brand': brand, 'points': points})
+    else:
+        add_player(player_id)
+        players[player_id].append({'type': type, 'brand': brand, 'points': points})
 
 def add_item_to_player(player_id, type, brand, points):
     # If the player exists, add the new item
@@ -62,7 +106,7 @@ def add_item_to_player(player_id, type, brand, points):
 # add_player(1, 37.7749, -122.4194, 'Car', 'BrandB')
 
 @app.route('/grabgarbage', methods=['POST'])
-def add_garbage():
+def grab_garbage():
 
     # Handle the image file
     if 'image' not in request.files:
@@ -73,7 +117,7 @@ def add_garbage():
         return jsonify({'error': 'No selected file'}), 400
 
     pid = request.form.get('id', 'No argument provided')
-    
+
     try:
         filename = secure_filename(file.filename)
         filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
@@ -86,17 +130,17 @@ def add_garbage():
         # Generate description (custom function you may have defined elsewhere)
         description = generate_description(image)
 
-        garbage = is_garbage(description)
-        recyclable = is_recyclable(description)
-        garbage_type = get_type(description)
-        garbage_brand = get_product_name(str(description))
+        
+
+
+
         points = 0
 
-        '''
-        if garbage_brand is None:
-            return jsonify({'error': 'Could not identify brand, please take another clear photo!'}), 400
+        garbage = answer_yes_no(generate_answer(image, "what type of garbage is this?"))
 
-        '''
+        garbage_type = generate_answer(image, "what type of garbage is this?")
+        garbage_brand = generate_answer(image, "what brand is the product in the image")
+
 
         if garbage:
             if garbage_type == "bottle":
@@ -116,7 +160,7 @@ def add_garbage():
             elif garbage_type == "organic":
                 points = 10
             else:
-                points = 2
+                points = 10
 
 
         # checking if player already has the item
@@ -132,10 +176,66 @@ def add_garbage():
             'garbage': garbage,
             'description': description,
             'brand': garbage_brand,
-            'recyclable': recyclable,
             'type': garbage_type,
             'points': points,
             'ocr': ocr_info
+        }), 200
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+    
+
+@app.route('/throwgarbage', methods=['POST'])
+def throw_garbage():
+
+    # Handle the image file
+    if 'image' not in request.files:
+        return jsonify({'error': 'No image file provided'}), 400
+
+    file = request.files['image']
+    if file.filename == '':
+        return jsonify({'error': 'No selected file'}), 400
+
+    pid = request.form.get('id', 'No argument provided')
+    #lon = request.form.get('lon', 'No lon argument')
+    #lat = request.form.get('lat', "No lat argument")
+    points = int(request.form.get('points', "No points argument"))
+
+    try:
+        filename = secure_filename(file.filename)
+        filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        file.save(filepath)
+
+        # Perform OCR using pytesseract
+        image = Image.open(filepath)
+        ocr_info = pytesseract.image_to_string(image)
+
+        # Generate description (custom function you may have defined elsewhere)
+        thrown_away = answer_yes_no(generate_answer(image, "is something being thrown away?"))
+
+        garbage_type = generate_answer(image, "what type of garbage is being thrown away?")
+        garbage_brand = generate_answer(image, "what brand of garbage is being thrown away")
+
+        item = {}
+
+        if thrown_away == True:
+            if has_item(pid, garbage_type, garbage_brand):
+                item = get_item(pid, garbage_type, garbage_brand)
+                delete_item(pid, garbage_type, garbage_brand)
+                points = points + item['points']
+            else:
+                points = points + 3
+                return jsonify({'error': "Oops! Looks like you forgot to take a photo before you through it out. Don't worry, we'll give you a couple points just for trying, but remember next time!", 'points':str(points)}), 200
+        
+        
+        return jsonify({
+            'pid': pid,
+            'player_items': players[pid],
+            'brand': garbage_brand,
+            'type': garbage_type,
+            'points': points,
+            'item': item,
+            'throwaway' : thrown_away
         }), 200
 
     except Exception as e:
