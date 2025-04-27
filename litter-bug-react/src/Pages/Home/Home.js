@@ -39,21 +39,19 @@ Track down litter, find the right bins, and help keep your world looking awesome
 
       {/* Counters */}
       <div className="coins-counter">
-          <span> ✨ Trash-Coins: {coins}</span>
+          <span>  🍌Fuel: {coins}</span>
         </div>
 
 
       {/* Character Section */}
       <div className="character-section">
         <img 
-          src="green_idle.gif" 
+          src="ship_broken.gif" 
           alt="Character" 
           className="character-image"
           onClick={handleCharacterClick}
         />
-        <button className="customize-button" onClick={() => setCurrentPage('customize')}>
-          Customize
-        </button>
+
         <button className="letsgo-button" onClick={() => setCurrentPage('walk')}>
           Let's Go!
         </button>

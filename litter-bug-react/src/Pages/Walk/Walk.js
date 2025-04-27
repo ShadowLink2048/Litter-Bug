@@ -47,7 +47,7 @@ Track your progress as you walk and clean up the neighborhood. Take pictures of 
             className="planet-image"
           />
           <img 
-            src="green_walk.gif" 
+            src="white_walk.gif" 
             alt="Character" 
             className="character-image"
           />
