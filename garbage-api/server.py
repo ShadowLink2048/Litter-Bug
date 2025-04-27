@@ -221,8 +221,10 @@ def throw_garbage():
         if thrown_away == True:
             if has_item(pid, garbage_type, garbage_brand):
                 item = get_item(pid, garbage_type, garbage_brand)
-                delete_item(pid, garbage_type, garbage_brand)
                 points = points + item['points']
+                
+                delete_item(pid, garbage_type, garbage_brand)
+                
             else:
                 points = points + 3
                 return jsonify({'error': "Oops! Looks like you forgot to take a photo before you through it out. Don't worry, we'll give you a couple points just for trying, but remember next time!", 'points':str(points)}), 200

@@ -15,12 +15,12 @@ Track your progress as you walk and clean up the neighborhood. Take pictures of 
   };
 
   const handleTakePickUpPhoto = () => {
-    alert("📸 Picture of picking up garbage taken!");
+    alert("📸 Make sure to hold your finding close to the photo, with the logo clearly visible.");
     setCurrentPage('garbagephoto');
   };
 
   const handleTakeThrowAwayPhoto = () => {
-    alert("📸 Picture of throwing away garbage taken!");
+    alert("📸 Make sure your photograph shows the garbage item and the garbage can in the same shot.");
     setCoins(coins + 10); // Example increment for taking a photo
     setCurrentPage('throwawayphoto');
 
@@ -40,12 +40,22 @@ Track your progress as you walk and clean up the neighborhood. Take pictures of 
 
       {/* Character Image */}
       <div className="character-section">
-        <img 
-          src="green_walk.gif" 
-          alt="Character" 
-          className="character-image"
-        />
+        <div className="character-wrapper">
+          <img 
+            src="earth.png" 
+            alt="Planet" 
+            className="planet-image"
+          />
+          <img 
+            src="green_walk.gif" 
+            alt="Character" 
+            className="character-image"
+          />
+        </div>
       </div>
+
+
+      
 
       {/* Action Buttons */}
       <div className="action-buttons">
