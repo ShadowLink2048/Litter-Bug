@@ -31,14 +31,9 @@ function HomePage() {
       </button>
 
       {/* Counters */}
-      <div className="counter-container">
-        <div className="steps-counter">
-          <span> 🚶‍♀️ Steps: {steps}</span>
-        </div>
-        <div className="coins-counter">
+      <div className="coins-counter">
           <span> ✨ Trash-Coins: {coins}</span>
         </div>
-      </div>
 
 
       {/* Character Section */}
@@ -59,9 +54,6 @@ function HomePage() {
 
       
 
-      <button className="settings-button" onClick={() => setCurrentPage('settings')}>
-        ⚙️
-      </button>
       
       <button className="about-button" onClick={() => handleAboutClick()}>
         ❓

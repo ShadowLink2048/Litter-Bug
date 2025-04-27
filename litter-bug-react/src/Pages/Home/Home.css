@@ -43,17 +43,15 @@
     display: flex;
     margin-top: 80px;
     justify-content: center; /* Center items horizontally */
-    gap: 50px; /* Adds space between the two counters */
   }
   
-  .steps-counter,
   .coins-counter {
     font-size: 15px;
     background-color: white;
-    padding: 10px 5px;
+    padding: 10px 20px;
     border-radius: 20px;
     box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
-    width: 45%; /* Each counter takes up 45% of the width */
+    width: 80%; /* Makes the coins counter wider */
     text-align: center;
   }
 
