@@ -1,39 +1,42 @@
 # api_server.py (inside database_py_files)
-
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 from db_utils import export_users_to_json
 from geo_utils import get_bins_within_radius, get_trash_within_radius
 from login_utils_db import get_user_profile, game_db
 from login_utils_db import hash_passkey, check_hash_match, add_logged_in_user, logged_in, collection
-
-
+from pymongo import MongoClient
+from bson import ObjectId
+from math import radians, cos, sin, sqrt, atan2
 import subprocess
 import os
+import bcrypt
+import datetime
+
+app = Flask(__name__)
+CORS(app)
+
+client = MongoClient('mongodb://localhost:27017/')
+db = client['litter_bug_db']
+users_collection = db['Users']
+trash_collection = db['Trash']
+bins_collection = db['Bins']
 
 DB_SETUP_FLAG = "DB_SETUP_COMPLETE.flag"
 
 def run_db_setup():
     try:
         print("🔧 Running database setup script...")
-        subprocess.run(["python", "setup_all.py"], check=True)  # Since it's in the same folder
+        subprocess.run(["python", "setup_all.py"], check=True)
         with open(DB_SETUP_FLAG, "w") as flag_file:
             flag_file.write("Database setup completed.")
         print("✅ Database setup completed successfully.")
     except subprocess.CalledProcessError as e:
         print("❌ Database setup failed:", e)
 
-# Only run setup if not already done
 if not os.path.exists(DB_SETUP_FLAG):
     run_db_setup()
 
-
-app = Flask(__name__)
-CORS(app)
-
-# -----------------------------
-# General API Health Check
-# -----------------------------
 @app.route('/', methods=['GET'])
 def index():
     return jsonify({'message': 'Litter-Bug API is running!'}), 200
@@ -53,9 +56,6 @@ def create_or_get_profile():
     else:
         return jsonify({'error': 'User not found in login_db'}), 404
 
-# -----------------------------
-# EXPORT USERS TO JSON
-# -----------------------------
 @app.route('/api/users/export', methods=['GET'])
 def export_users():
     try:
@@ -64,9 +64,6 @@ def export_users():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-# -----------------------------
-# GET NEARBY BINS
-# -----------------------------
 @app.route('/api/bins/nearby', methods=['POST'])
 def get_nearby_bins():
     data = request.get_json()
@@ -76,9 +73,6 @@ def get_nearby_bins():
     bins = get_bins_within_radius(lon, lat, radius)
     return jsonify({'bins': bins}), 200
 
-# -----------------------------
-# GET NEARBY TRASH
-# -----------------------------
 @app.route('/api/trash/nearby', methods=['POST'])
 def get_nearby_trash():
     data = request.get_json()
@@ -88,93 +82,44 @@ def get_nearby_trash():
     trash = get_trash_within_radius(lon, lat, radius)
     return jsonify({'trash': trash}), 200
 
-# -----------------------------
-# SIGNUP (USER REGISTRATION)
-# -----------------------------
-@app.route('/signup', methods=['POST'])
 @app.route('/signup', methods=['POST'])
 def signup():
     data = request.get_json()
-    print("🟢 Received signup request with data:", data)  # Debug line
-
-    username = data.get('username')
-    passkey = data.get('passkey')
-    email = data.get('email', '')
-    firstname = data.get('firstname', '')
-    lastname = data.get('lastname', '')
-
+    username, passkey = data.get('username'), data.get('passkey')
+    email, firstname, lastname = data.get('email', ''), data.get('firstname', ''), data.get('lastname', '')
     if not username or not passkey:
-        print("❌ Missing required inputs!")
         return jsonify({'error': 'Missing required inputs'}), 400
-
-    print("🔍 Checking for existing user...")
-    print("📂 Collection object being used:", collection)
-
-    user_exists = collection.find_one({'username': username})
-    email_exists = collection.find_one({'email': email}) if email else None
-
-    print("🟠 User exists check:", user_exists)
-    print("🟠 Email exists check:", email_exists)
-
-    if user_exists or email_exists:
-        print("⚠️ Username or email already exists!")
+    if collection.find_one({'username': username}) or (email and collection.find_one({'email': email})):
         return jsonify({'error': 'Username or email already exists'}), 409
-
-    if not isinstance(passkey, str) or len(passkey) < 8:
-        print("❌ Passkey too short!")
+    if len(passkey) < 8:
         return jsonify({'error': 'Passkey must be at least 8 characters'}), 401
-
     hashed_passkey = hash_passkey(passkey).decode('utf-8')
-    new_user = {
-        'username': username,
-        'firstname': firstname,
-        'lastname': lastname,
-        'passkey': hashed_passkey,
-        'email': email
-    }
-
-    print("✅ Inserting new user into DB:", new_user)
-    result = collection.insert_one(new_user)
-    print("🟢 Insert result ID:", result.inserted_id)
-
+    new_user = {'username': username, 'firstname': firstname, 'lastname': lastname, 'passkey': hashed_passkey, 'email': email}
+    collection.insert_one(new_user)
     return jsonify({'success': f"{username} must now log in"}), 201
 
-
-# -----------------------------
-# LOGIN
-# -----------------------------
 @app.route('/login', methods=['POST'])
 def login():
     data = request.get_json()
     username, passkey = data.get('username'), data.get('passkey')
     if not username or not passkey:
         return jsonify({'error': 'Missing required inputs'}), 400
-
     user = collection.find_one({'username': username})
     if not user or not check_hash_match(passkey, user['passkey']):
         return jsonify({'error': 'Invalid username or passkey'}), 401
-
     add_logged_in_user(username)
     token = logged_in[username]['tokenid']
-
-    # 🔥 ADD THIS LINE to auto-create the profile:
     get_user_profile(username)
-
     return jsonify({'success': "User logged in", 'tokenid': token}), 201
 
-# -----------------------------
-# USERINFO (TOKEN CHECK)
-# -----------------------------
 @app.route('/userinfo', methods=['POST'])
 def userinfo():
     data = request.get_json()
     username, tokenid = data.get('username'), data.get('tokenid')
     if not username or not tokenid:
         return jsonify({'error': 'Missing required inputs'}), 400
-
     if username not in logged_in or logged_in[username]['tokenid'] != tokenid:
         return jsonify({'error': 'Invalid token or user not logged in'}), 401
-
     user = collection.find_one({'username': username})
     if user:
         user.pop('_id', None)
@@ -182,88 +127,48 @@ def userinfo():
         return jsonify(user), 200
     return jsonify({'error': 'User not found'}), 404
 
-# -----------------------------
-# Add bins
-# -----------------------------
-@app.route('/api/bins/add', methods=['POST'])
-@app.route('/api/bins/add', methods=['POST'])
-def add_bin():
+@app.route('/api/users/update/<username>', methods=['PATCH'])
+def update_user(username):
     data = request.get_json()
-    username = data.get('username')
     tokenid = data.get('tokenid')
-    lon = data.get('longitude')
-    lat = data.get('latitude')
-    bin_type = data.get('type')
-
-    # Check for missing inputs
-    if None in (username, tokenid, lon, lat, bin_type):
-        return jsonify({'error': 'Missing required inputs'}), 400
-
-    # Validate token
     if username not in logged_in or logged_in[username]['tokenid'] != tokenid:
         return jsonify({'error': 'Invalid token or user not logged in'}), 401
+    update_fields = {field: data[field] for field in ['recycle_coins', 'trash_coins', 'waste_coins', 'steps', 'equipment'] if field in data}
+    if not update_fields:
+        return jsonify({'error': 'No valid fields provided for update.'}), 400
+    result = users_collection.update_one({'username': username}, {'$set': update_fields})
+    if result.matched_count == 0:
+        return jsonify({'error': 'User not found.'}), 404
+    return jsonify({'success': f'User {username} updated successfully.'}), 200
 
-    # Validate bin type
-    if bin_type not in ['recycle', 'trash']:
-        return jsonify({'error': 'Invalid type. Must be "recycle" or "trash"'}), 400
+@app.route('/api/trash/collect', methods=['POST'])
+def collect_trash():
+    data = request.get_json()
+    username, tokenid, trash_id = data.get('username'), data.get('tokenid'), data.get('trash_id')
+    if username not in logged_in or logged_in[username]['tokenid'] != tokenid:
+        return jsonify({'error': 'Invalid token or user not logged in'}), 401
+    if not trash_id:
+        return jsonify({'error': 'Missing trash_id.'}), 400
+    trash_item = game_db.Trash.find_one({'_id': ObjectId(trash_id)})
+    if not trash_item:
+        return jsonify({'error': 'Trash item not found.'}), 404
+    if trash_item.get('is_collected'):
+        return jsonify({'error': 'Trash has already been collected.'}), 409
+    game_db.Trash.update_one({'_id': ObjectId(trash_id)}, {'$set': {'is_collected': True, 'picked_up_by': username}})
+    users_collection.update_one({'username': username}, {'$inc': {'trash_coins': 10}})
+    return jsonify({'success': f'Trash {trash_id} collected by {username}. 10 trash coins awarded!'}), 200
 
-    bin_doc = {
-        "longitude": lon,  # NOT location!
-        "latitude": lat,  # Direct values
-        "type": bin_type
-    }
-
+@app.route('/api/users/top-trash-scores', methods=['GET'])
+def get_top_trash_scores():
     try:
-        result = game_db.Bins.insert_one(bin_doc)
-        return jsonify({'success': 'Bin added', 'bin_id': str(result.inserted_id)}), 201
+        top_users = users_collection.find({}, {'username': 1, 'trash_coins': 1, '_id': 0}).sort('trash_coins', -1).limit(10)
+        result = [{'username': user.get('username'), 'trash_coins': user.get('trash_coins', 0)} for user in top_users]
+        return jsonify({'leaderboard': result, 'message': 'Top 10 trash token scores'}), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-# -----------------------------
-# Add Trash
-# -----------------------------
-
-@app.route('/api/trash/add', methods=['POST'])
-@app.route('/api/trash/add', methods=['POST'])
-def add_trash():
-    data = request.get_json()
-    username = data.get('username')
-    tokenid = data.get('tokenid')
-    lon = data.get('longitude')
-    lat = data.get('latitude')
-    trash_type = data.get('type')
-
-    if None in (username, tokenid, lon, lat, trash_type):
-        return jsonify({'error': 'Missing required inputs'}), 400
-
-    if username not in logged_in or logged_in[username]['tokenid'] != tokenid:
-        return jsonify({'error': 'Invalid token or user not logged in'}), 401
-
-    if trash_type not in ['recycle', 'trash']:
-        return jsonify({'error': 'Invalid type. Must be "recycle" or "trash"'}), 400
-
-    from datetime import datetime, timezone
-
-    trash_doc = {
-        "longitude": lon,
-        "latitude": lat,
-        "type": trash_type,
-        "is_collected": False,  # Default value
-        "timestamp": datetime.now(timezone.utc),  # Current UTC time
-        "dropped_by": username,  # Optional, but helpful!
-        "picked_up_by": None  # Not picked up yet
-    }
-
-    try:
-        result = game_db.Trash.insert_one(trash_doc)
-        return jsonify({'success': 'Trash item added', 'trash_id': str(result.inserted_id)}), 201
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
-
-
-
-# -----------------------------
-# Run the server
-# -----------------------------
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=3001)
+    app.run(debug=True, host='0.0.0.0', port=5000)
+
+#score board info
+#http://localhost:5000/api/users/top-trash-scores
