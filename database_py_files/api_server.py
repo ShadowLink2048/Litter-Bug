@@ -8,8 +8,6 @@ from login_utils_db import hash_passkey, check_hash_match, add_logged_in_user, l
 from pymongo import MongoClient
 from bson import ObjectId
 from math import radians, cos, sin, sqrt, atan2
-import subprocess
-import os
 import bcrypt
 import datetime
 
@@ -24,15 +22,46 @@ bins_collection = db['Bins']
 
 DB_SETUP_FLAG = "DB_SETUP_COMPLETE.flag"
 
+import subprocess
+import sys
+import os
+
+
 def run_db_setup():
     try:
         print("🔧 Running database setup script...")
-        subprocess.run(["python3", "setup_all.py"], check=True)
+
+        # Check for the correct Python command based on the platform
+        python_command = "python3" if sys.platform != "win32" else "python"
+
+        # Log the command being run
+        print(f"Running command: {python_command} setup_all.py")
+
+        # Run the setup script
+        result = subprocess.run([python_command, "setup_all.py"], check=True)
+
+        # Log the return code of the subprocess to see if it's successful
+        print(f"Subprocess result code: {result.returncode}")
+
+        if result.returncode == 0:
+            print("✅ Database setup script ran successfully.")
+        else:
+            print(f"⚠️ Database setup script returned non-zero exit code: {result.returncode}")
+
+        # Create the flag file
         with open(DB_SETUP_FLAG, "w") as flag_file:
             flag_file.write("Database setup completed.")
-        print("✅ Database setup completed successfully.")
+            print(f"✅ Flag file '{DB_SETUP_FLAG}' created successfully.")
+
     except subprocess.CalledProcessError as e:
         print("❌ Database setup failed:", e)
+    except FileNotFoundError as e:
+        print("❌ Python is not installed or cannot be found:", e)
+    except PermissionError as e:
+        print(f"❌ Permission error: {e}")
+    except Exception as e:
+        print(f"❌ An unexpected error occurred: {e}")
+
 
 if not os.path.exists(DB_SETUP_FLAG):
     run_db_setup()
