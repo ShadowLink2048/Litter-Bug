@@ -92,7 +92,7 @@ def get_user_profile(user_id):
     """
     Verifies the user exists in login_db and ensures a game profile exists in litter_bug_db.
     """
-    login_user = collection.find_one({"id": user_id})  # Uses the collection alias here
+    login_user = collection.find_one({"username": user_id})  # Uses the collection alias here
     if not login_user:
         print(f"❌ Login failed: user '{user_id}' not found in login_db.")
         return None
