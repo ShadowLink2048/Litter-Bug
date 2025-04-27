@@ -3,6 +3,17 @@ import { useState } from 'react';
 import './Walk.css';
 
 function WalkPage() {
+
+
+  const getPointsFromLocalStorage = () => {
+    // Get the points from local storage
+    const points = localStorage.getItem('userPoints');
+
+    // If points exist, return them, else return a default value (0)
+    return points ? parseInt(points, 10) : 0;
+  };
+
+
   const { setCurrentPage } = usePage();
   const [coins, setCoins] = useState(0); // Trash-Coins state
 
@@ -30,7 +41,7 @@ Track your progress as you walk and clean up the neighborhood. Take pictures of 
     <div className="walk-container">
       {/* Trash-Coins */}
       <div className="coins-counter">
-        <span> ✨ Trash-Coins: {coins}</span>
+        <span> ✨ Trash-Coins: {getPointsFromLocalStorage()}</span>
       </div>
 
       {/* Leave button */}

@@ -11,7 +11,11 @@ function LoginPage() {
 
   const handleLogin = () => {
     const savedUser = JSON.parse(localStorage.getItem('user'));
-  
+    
+
+    localStorage.setItem('userPoints', 0);
+
+
     if (savedUser && username === savedUser.username && password === savedUser.password) {
       setError('');
       setCurrentPage('home');

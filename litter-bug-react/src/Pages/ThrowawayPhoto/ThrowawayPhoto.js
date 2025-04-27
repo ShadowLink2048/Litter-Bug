@@ -11,6 +11,14 @@ function ThrowawayPhotoPage() {
     const [playerId, setPlayerId] = useState('12345'); // Example player ID, replace with actual logic
     const [points, setPoints] = useState(0); // New points state
 
+    const getPointsFromLocalStorage = () => {
+        // Get the points from local storage
+        const points = localStorage.getItem('userPoints');
+    
+        // If points exist, return them, else return a default value (0)
+        return points ? parseInt(points, 10) : 0;
+      };
+
     useEffect(() => {
         handleCapturePhoto();
     }, []);
@@ -66,7 +74,7 @@ function ThrowawayPhotoPage() {
         const formData = new FormData();
         formData.append('image', imageFile);
         formData.append('id', playerId);
-        formData.append('points', points); // Send points to the server
+        formData.append('points', getPointsFromLocalStorage()); // Send points to the server
 
         try {
             const response = await fetch('http://localhost:2001/throwgarbage', {
@@ -75,8 +83,25 @@ function ThrowawayPhotoPage() {
             });
 
             const responseData = await response.json();
-            alert(`Server Response: ${JSON.stringify(responseData)}`);
 
+            if (responseData) {
+                // Check if there's not an 'error' key in the responseData
+                if (!responseData.error) {
+                    // Check if points are zero
+                    let points = responseData.points;
+                    if (points === 0) {
+                        points = 2;  // Set points to 2 if it's 0
+                        alert(`Looks like you forgot to snap a photo picking it up, don't worry, you'll still get a couple points.`);
+                    } else {
+                        alert(`Thank you for throwing away: ${responseData.brand}, you now have ${points} points! Keep it up!`);
+                    }
+
+                    // Save the points to local storage
+                    localStorage.setItem('userPoints', points);
+                }
+                else { alert(`Error: ${response.error}`);
+            }
+            }
             if (responseData.points !== undefined) {
                 setPoints(responseData.points); // Update local points based on server response
             }

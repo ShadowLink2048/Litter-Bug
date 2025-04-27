@@ -9,6 +9,13 @@ function HomePage() {
   const [coins, setCoins] = useState(0);
 
 
+  const getPointsFromLocalStorage = () => {
+    // Get the points from local storage
+    const points = localStorage.getItem('userPoints');
+
+    // If points exist, return them, else return a default value (0)
+    return points ? parseInt(points, 10) : 0;
+  };
 
   const handleCharacterClick = () => {
     alert("👾 Your Friend Code: 123-456-789");
@@ -37,18 +44,18 @@ Track down litter to help him fuel his ship, and heal the earth along the way.
 
       {/* Counters */}
       <div className="coins-counter">
-          <span>  🍌Fuel: {coins}</span>
+          <span>  🍌Fuel: {getPointsFromLocalStorage()}</span>
         </div>
 
 
       {/* Character Section */}
       <div className="character-section">
-        <img 
-          src="ship_broken.gif" 
-          alt="Character" 
-          className="character-image"
-          onClick={handleCharacterClick}
-        />
+      <img 
+        src={getPointsFromLocalStorage() >= 20 ? "ship_fixed.png" : "ship_broken.gif"} 
+        alt="Character" 
+        className="character-image" 
+        onClick={handleCharacterClick} 
+      />
 
         <button className="letsgo-button" onClick={() => setCurrentPage('walk')}>
           Let's Go!
