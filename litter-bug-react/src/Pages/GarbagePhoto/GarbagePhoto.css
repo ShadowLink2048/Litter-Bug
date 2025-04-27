@@ -53,18 +53,20 @@
     display: flex;
     justify-content: center;
     align-items: flex-start; /* Align to top instead of center */
-    padding-top: 100px; /* Push it down a bit */
+    padding-top: 50px; /* Push it further down */
     z-index: 20000;
 }
 
-
 .modal-content {
     background: white;
-    padding: 30px;
+    padding: 50px; /* Increase padding for more height */
     border-radius: 8px;
     text-align: center;
     min-width: 300px;
+    min-height: 500px; /* Make it a lot taller */
+    height: auto; /* Allow the height to adjust dynamically */
 }
+
 
 .modal input {
     margin-top: 10px;
