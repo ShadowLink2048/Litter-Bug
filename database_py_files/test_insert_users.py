@@ -2,13 +2,16 @@ from pymongo import MongoClient
 import random
 import datetime
 from datetime import timezone
+from login_utils_db import hash_passkey  # Password hasher
 
 # Connect to MongoDB
 client = MongoClient('mongodb://localhost:27017/')
-db = client['litter_bug_db']
-users_collection = db['Users']
+game_db = client['litter_bug_db']
+login_db = client['login_db']
 
-# 🎯 Use a list of real names in game names and fantasy names for showcase/demo
+game_users_collection = game_db['Users']
+login_users_collection = login_db['Users']
+
 name_pool = [
     "Alice", "Bob", "Charlie", "Diana", "Ethan", "Fiona", "George", "Hannah", "Ian", "Julia",
     "Kevin", "Lily", "Mason", "Nina", "Oscar", "Paula", "Quinn", "Riley", "Sophia", "Thomas",
@@ -26,20 +29,60 @@ name_pool = [
     "EclipseHunter", "VoltSurge", "SonicBoom", "AtomicRhino", "BladeRunner", "CrimsonWolf"
 ]
 
+# ----------------------------
+# ✅ Index Safety Check & Cleanup
+# ----------------------------
+def check_and_fix_indexes():
+    indexes = login_users_collection.index_information()
+    if "id_1" in indexes:
+        print("⚠️ Removing old 'id' index from login_db.Users...")
+        login_users_collection.drop_index("id_1")
+        print("✅ 'id' index removed.")
 
+    # Ensure 'username' has a unique index
+    existing_indexes = login_users_collection.index_information()
+    if not any(index.get("key") == [('username', 1)] for index in existing_indexes.values()):
+        print("🔧 Creating unique index on 'username' field...")
+        login_users_collection.create_index([("username", 1)], unique=True)
+        print("✅ Unique index on 'username' created.")
+    else:
+        print("✅ Unique index on 'username' already exists.")
 
+# ----------------------------
+# Insert Test Users Function
+# ----------------------------
 def insert_test_users():
-    """Inserts 10 test users with random real first names and random trash_coins values."""
-    test_users = []
-    selected_names = random.sample(name_pool, 10)  # Pick 10 unique names
+    check_and_fix_indexes()  # Ensure login DB indexes are correct before inserting
+
+    selected_names = random.sample(name_pool, 10)
 
     for name in selected_names:
-        trash_coins = random.randint(0, 1000)
-        test_user = {
+        # Check if user already exists in either login DB OR game DB:
+        login_exists = login_users_collection.find_one({"username": name})
+        game_exists = game_users_collection.find_one({"username": name})
+
+        if login_exists or game_exists:
+            print(f"⚠️ User '{name}' already exists (login or game DB), skipping.")
+            continue
+
+        # -----------------------------
+        # Insert into login DB first (get the login ID)
+        login_user = {
             "username": name,
-            "password": "testpassword",  # Dummy password (would be hashed in real cases)
+            "passkey": hash_passkey("testpassword").decode('utf-8')
+        }
+        login_result = login_users_collection.insert_one(login_user)
+        login_id = login_result.inserted_id  # <--- Grab the login ID!
+        print(f"🔗 Created login user '{name}' with login_id: {login_id}")
+
+        # -----------------------------
+        # Insert into game DB and link login_id
+        game_user = {
+            "username": name,
+            "login_id": login_id,  # <-- LINK HERE!
+            "password": "testpassword",  # Dummy field for testing/demo purposes
             "recycle_coins": random.randint(0, 500),
-            "trash_coins": trash_coins,
+            "trash_coins": random.randint(0, 1000),
             "waste_coins": random.randint(0, 500),
             "accessories": {
                 "hat": None,
@@ -52,11 +95,10 @@ def insert_test_users():
             "steps": random.randint(0, 10000),
             "created_at": datetime.datetime.now(timezone.utc)
         }
-        test_users.append(test_user)
+        game_users_collection.insert_one(game_user)
 
-    users_collection.insert_many(test_users)
-    print("✅ Inserted 10 showcase-ready test users with real names and random trash token scores.")
+        print(f"✅ Linked game user '{name}' to login_id '{login_id}'.")
 
-
+# ----------------------------
 if __name__ == "__main__":
     insert_test_users()

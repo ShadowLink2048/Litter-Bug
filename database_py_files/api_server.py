@@ -42,7 +42,7 @@ def index():
     return jsonify({'message': 'Litter-Bug API is running!'}), 200
 
 # -----------------------------
-# PROFILE CREATION / FETCH
+# PROFILE CREATION / FETCH (LOGIN DB ONLY)
 # -----------------------------
 @app.route('/api/profile', methods=['POST'])
 def create_or_get_profile():
@@ -56,6 +56,31 @@ def create_or_get_profile():
     else:
         return jsonify({'error': 'User not found in login_db'}), 404
 
+# -----------------------------
+# GET FULL USER INFO BY MONGODB _id (GAME DB)
+# -----------------------------
+@app.route('/api/users/get-by-id', methods=['POST'])
+def get_user_by_id():
+    data = request.get_json()
+    user_id = data.get('user_id')
+
+    if not user_id:
+        return jsonify({'error': 'Missing user_id'}), 400
+
+    try:
+        user = users_collection.find_one({'_id': ObjectId(user_id)})
+        if user:
+            user['_id'] = str(user['_id'])
+            user.pop('passkey', None)
+            return jsonify({'user': user}), 200
+        else:
+            return jsonify({'error': 'User not found'}), 404
+    except Exception as e:
+        return jsonify({'error': f'Invalid ID format or server error: {str(e)}'}), 500
+
+# -----------------------------
+# EXPORT USERS TO JSON
+# -----------------------------
 @app.route('/api/users/export', methods=['GET'])
 def export_users():
     try:
@@ -64,6 +89,9 @@ def export_users():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+# -----------------------------
+# GET NEARBY BINS
+# -----------------------------
 @app.route('/api/bins/nearby', methods=['POST'])
 def get_nearby_bins():
     data = request.get_json()
@@ -73,6 +101,9 @@ def get_nearby_bins():
     bins = get_bins_within_radius(lon, lat, radius)
     return jsonify({'bins': bins}), 200
 
+# -----------------------------
+# GET NEARBY TRASH
+# -----------------------------
 @app.route('/api/trash/nearby', methods=['POST'])
 def get_nearby_trash():
     data = request.get_json()
@@ -82,22 +113,65 @@ def get_nearby_trash():
     trash = get_trash_within_radius(lon, lat, radius)
     return jsonify({'trash': trash}), 200
 
+# -----------------------------
+# SIGNUP (USER REGISTRATION)
+# -----------------------------
 @app.route('/signup', methods=['POST'])
 def signup():
     data = request.get_json()
     username, passkey = data.get('username'), data.get('passkey')
     email, firstname, lastname = data.get('email', ''), data.get('firstname', ''), data.get('lastname', '')
+
+    # Check for required fields
     if not username or not passkey:
         return jsonify({'error': 'Missing required inputs'}), 400
+
+    # Check if the username or email already exists
     if collection.find_one({'username': username}) or (email and collection.find_one({'email': email})):
         return jsonify({'error': 'Username or email already exists'}), 409
+
+    # Hash the passkey (password)
     if len(passkey) < 8:
         return jsonify({'error': 'Passkey must be at least 8 characters'}), 401
     hashed_passkey = hash_passkey(passkey).decode('utf-8')
-    new_user = {'username': username, 'firstname': firstname, 'lastname': lastname, 'passkey': hashed_passkey, 'email': email}
-    collection.insert_one(new_user)
+
+    # Insert into the login DB (first)
+    new_login_user = {
+        'username': username,
+        'firstname': firstname,
+        'lastname': lastname,
+        'passkey': hashed_passkey,
+        'email': email
+    }
+    login_result = collection.insert_one(new_login_user)  # Insert into login DB
+    login_id = login_result.inserted_id  # Retrieve the login ID
+
+    # Insert into the game DB (second), linking the login ID
+    new_game_user = {
+        "username": username,
+        "login_id": login_id,  # Link to login DB
+        "recycle_coins": 0,
+        "trash_coins": 0,
+        "waste_coins": 0,
+        "accessories": {
+            "hat": None,
+            "shirt": None,
+            "pants": None,
+            "shoes": None,
+            "hand_left": None,
+            "hand_right": None
+        },
+        "steps": 0,
+        "created_at": datetime.datetime.now(datetime.timezone.utc)
+    }
+    users_collection.insert_one(new_game_user)  # Insert into game DB
+
     return jsonify({'success': f"{username} must now log in"}), 201
 
+
+# -----------------------------
+# LOGIN
+# -----------------------------
 @app.route('/login', methods=['POST'])
 def login():
     data = request.get_json()
@@ -112,6 +186,9 @@ def login():
     get_user_profile(username)
     return jsonify({'success': "User logged in", 'tokenid': token}), 201
 
+# -----------------------------
+# USERINFO (TOKEN CHECK)
+# -----------------------------
 @app.route('/userinfo', methods=['POST'])
 def userinfo():
     data = request.get_json()
@@ -127,6 +204,9 @@ def userinfo():
         return jsonify(user), 200
     return jsonify({'error': 'User not found'}), 404
 
+# -----------------------------
+# USER UPDATE (PATCH user data)
+# -----------------------------
 @app.route('/api/users/update/<username>', methods=['PATCH'])
 def update_user(username):
     data = request.get_json()
@@ -141,6 +221,9 @@ def update_user(username):
         return jsonify({'error': 'User not found.'}), 404
     return jsonify({'success': f'User {username} updated successfully.'}), 200
 
+# -----------------------------
+# TRASH COLLECTION (pick up trash)
+# -----------------------------
 @app.route('/api/trash/collect', methods=['POST'])
 def collect_trash():
     data = request.get_json()
@@ -158,6 +241,9 @@ def collect_trash():
     users_collection.update_one({'username': username}, {'$inc': {'trash_coins': 10}})
     return jsonify({'success': f'Trash {trash_id} collected by {username}. 10 trash coins awarded!'}), 200
 
+# -----------------------------
+# LEADERBOARD
+# -----------------------------
 @app.route('/api/users/top-trash-scores', methods=['GET'])
 def get_top_trash_scores():
     try:

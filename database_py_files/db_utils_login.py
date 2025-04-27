@@ -5,17 +5,18 @@ from pymongo.errors import DuplicateKeyError
 client = MongoClient("mongodb://localhost:27017/")
 db = client["login_db"]
 
-def insert_user(user_id, passkey):
+def insert_user(username, passkey):
     user_doc = {
-        "id": user_id,         # Can be string or int, depending on your system
-        "passkey": passkey     # Stored directly as given
+        "username": username,
+        "passkey": passkey,
+        # Add any other required fields here
     }
 
     try:
         result = db.Users.insert_one(user_doc)
-        print(f"✅ New user with ID '{user_id}' added successfully (Mongo _id: {result.inserted_id})")
+        print(f"✅ New user '{username}' added successfully (Mongo _id: {result.inserted_id})")
     except DuplicateKeyError:
-        print(f"⚠️ User ID '{user_id}' already exists. Choose a different ID.")
+        print(f"⚠️ User '{username}' already exists. Choose a different username.")
 
 # Example usage:
 if __name__ == "__main__":
