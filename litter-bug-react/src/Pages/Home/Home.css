@@ -11,8 +11,8 @@
   
   .leaderboard-button {
     position: absolute;
-    top: 20px;
-    left: 20px;
+    bottom: 20px;  /* Move it to the bottom */
+    left: 20px;    /* Keep it to the left */
     background-color: gold;
     color: white;
     border: none;

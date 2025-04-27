@@ -1,32 +1,28 @@
-/* src/pages/Walk.css */
-body, html {
-    margin: 0;
-    padding: 0;
-    height: 100%;
-    overflow: hidden; /* Prevent scrolling */
-  }
-  
-  .walk-page {
-    position: relative;
+.walk-container {
+    background-color: #b9ff99;
     height: 100vh;
-    width: 100vw;
-    margin: 0;
-    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    position: relative;
   }
   
-  .walk-page .leaflet-container {
-    z-index: 1; /* Lower z-index for the map */
-  }
-  
-  .quit-button, .camera-button, .report-button, .walk-image {
+  .coins-counter {
+    font-size: 15px;
+    background-color: white;
+    padding: 10px 20px;
+    border-radius: 20px;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
     position: absolute;
-    z-index: 2; /* Higher z-index to make them appear in front of the map */
-  }
-  
-  .quit-button {
     top: 20px;
-    right: 20px;
-    background-color: red;
+    left: 20px;
+  }
+  .leaderboard-button {
+    position: absolute;
+    bottom: 20px;  /* Move it to the bottom */
+    left: 20px;    /* Keep it to the left */
+    background-color: gold;
     color: white;
     border: none;
     border-radius: 50%;
@@ -34,12 +30,59 @@ body, html {
     height: 50px;
     font-size: 24px;
     cursor: pointer;
-    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.4);
+    box-shadow: 2px 2px 5px rgba(0,0,0,0.4);
+  }
+  .leave-button {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background-color: rgb(255, 255, 255);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    font-size: 24px;
+    cursor: pointer;
+    box-shadow: 2px 2px 5px rgba(0,0,0,0.4);
   }
   
-  .camera-button {
-    bottom: 80px;
-    left: 20px;
+  .character-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 100px; /* Adjust to center the character image */
+  }
+  
+  .character-image {
+    width: 360px;
+    height: 450px;
+    object-fit: cover;
+    margin-bottom: 20px;
+  }
+  
+  .action-buttons {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 40px; /* Spacing between character and buttons */
+  }
+  
+  .action-button {
+    background-color: white;
+    border: none;
+    border-radius: 20px;
+    padding: 10px 20px;
+    font-size: 18px;
+    margin-bottom: 20px;
+    cursor: pointer;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+  }
+  
+  .about-button {
+    position: absolute;
+    bottom: 50px;
+    right: 20px;
     background-color: white;
     color: #333;
     border: none;
@@ -49,29 +92,5 @@ body, html {
     font-size: 24px;
     cursor: pointer;
     box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.4);
-  }
-  
-  .report-button {
-    bottom: 140px;
-    left: 20px;
-    background-color: white;
-    color: #333;
-    border: none;
-    border-radius: 50%;
-    width: 50px;
-    height: 50px;
-    font-size: 16px;
-    cursor: pointer;
-    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.4);
-  }
-  
-  .walk-image {
-    bottom: 20px;
-    right: 20px;
-    width: 100px;
-    height: 100px;
-    object-fit: cover;
-    border-radius: 10px;
-    z-index: 3; /* Highest z-index for the image */
   }
   

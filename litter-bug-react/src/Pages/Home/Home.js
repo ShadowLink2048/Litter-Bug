@@ -28,9 +28,7 @@ Track down litter, find the right bins, and help keep your world looking awesome
   return (
     <div className="home-container">
       {/* Leaderboard */}
-      <button className="leaderboard-button" onClick={() => setCurrentPage('leaderboard')}>
-        🏆
-      </button>
+      
 
       {/* Friends 
       <button className="friends-button" onClick={() => setCurrentPage('friends')}>
@@ -48,7 +46,7 @@ Track down litter, find the right bins, and help keep your world looking awesome
       {/* Character Section */}
       <div className="character-section">
         <img 
-          src="placeholder_idle.gif" 
+          src="green_idle.gif" 
           alt="Character" 
           className="character-image"
           onClick={handleCharacterClick}
@@ -62,7 +60,9 @@ Track down litter, find the right bins, and help keep your world looking awesome
       </div>
 
       
-
+      <button className="leaderboard-button" onClick={() => setCurrentPage('leaderboard')}>
+        🏆
+      </button>
       
       <button className="about-button" onClick={() => handleAboutClick()}>
         ❓

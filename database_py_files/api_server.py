@@ -27,7 +27,7 @@ DB_SETUP_FLAG = "DB_SETUP_COMPLETE.flag"
 def run_db_setup():
     try:
         print("🔧 Running database setup script...")
-        subprocess.run(["python", "setup_all.py"], check=True)
+        subprocess.run(["python3", "setup_all.py"], check=True)
         with open(DB_SETUP_FLAG, "w") as flag_file:
             flag_file.write("Database setup completed.")
         print("✅ Database setup completed successfully.")
