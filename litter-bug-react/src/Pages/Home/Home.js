@@ -25,10 +25,12 @@ function HomePage() {
         🏆
       </button>
 
-      {/* Friends */}
+      {/* Friends 
       <button className="friends-button" onClick={() => setCurrentPage('friends')}>
         🤝
       </button>
+      */}
+      
 
       {/* Counters */}
       <div className="coins-counter">
