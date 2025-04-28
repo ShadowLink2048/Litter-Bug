@@ -461,5 +461,248 @@
         },
         "steps": 5000,
         "created_at": "2025-04-27T15:51:26.097000"
+    },
+    {
+        "_id": "680e6dbb275cf61f38f656e3",
+        "username": "EclipseHunter",
+        "login_id": "680e6dbb275cf61f38f656e2",
+        "password": "testpassword",
+        "recycle_coins": 279,
+        "trash_coins": 989,
+        "waste_coins": 206,
+        "accessories": {
+            "hat": null,
+            "shirt": null,
+            "pants": null,
+            "shoes": null,
+            "hand_left": null,
+            "hand_right": null
+        },
+        "steps": 5798,
+        "created_at": "2025-04-27T17:47:39.471000"
+    },
+    {
+        "_id": "680e6dbb275cf61f38f656e5",
+        "username": "Lily",
+        "login_id": "680e6dbb275cf61f38f656e4",
+        "password": "testpassword",
+        "recycle_coins": 77,
+        "trash_coins": 694,
+        "waste_coins": 116,
+        "accessories": {
+            "hat": null,
+            "shirt": null,
+            "pants": null,
+            "shoes": null,
+            "hand_left": null,
+            "hand_right": null
+        },
+        "steps": 5217,
+        "created_at": "2025-04-27T17:47:39.846000"
+    },
+    {
+        "_id": "680e6dbc275cf61f38f656e7",
+        "username": "Zara",
+        "login_id": "680e6dbc275cf61f38f656e6",
+        "password": "testpassword",
+        "recycle_coins": 90,
+        "trash_coins": 732,
+        "waste_coins": 102,
+        "accessories": {
+            "hat": null,
+            "shirt": null,
+            "pants": null,
+            "shoes": null,
+            "hand_left": null,
+            "hand_right": null
+        },
+        "steps": 1549,
+        "created_at": "2025-04-27T17:47:40.244000"
+    },
+    {
+        "_id": "680e6dbc275cf61f38f656e9",
+        "username": "ShadowWolf",
+        "login_id": "680e6dbc275cf61f38f656e8",
+        "password": "testpassword",
+        "recycle_coins": 402,
+        "trash_coins": 256,
+        "waste_coins": 195,
+        "accessories": {
+            "hat": null,
+            "shirt": null,
+            "pants": null,
+            "shoes": null,
+            "hand_left": null,
+            "hand_right": null
+        },
+        "steps": 9968,
+        "created_at": "2025-04-27T17:47:40.544000"
+    },
+    {
+        "_id": "680e6dbc275cf61f38f656eb",
+        "username": "NebulaQueen",
+        "login_id": "680e6dbc275cf61f38f656ea",
+        "password": "testpassword",
+        "recycle_coins": 274,
+        "trash_coins": 4,
+        "waste_coins": 168,
+        "accessories": {
+            "hat": null,
+            "shirt": null,
+            "pants": null,
+            "shoes": null,
+            "hand_left": null,
+            "hand_right": null
+        },
+        "steps": 5626,
+        "created_at": "2025-04-27T17:47:40.835000"
+    },
+    {
+        "_id": "680e6dbd275cf61f38f656ed",
+        "username": "Mason",
+        "login_id": "680e6dbd275cf61f38f656ec",
+        "password": "testpassword",
+        "recycle_coins": 299,
+        "trash_coins": 384,
+        "waste_coins": 6,
+        "accessories": {
+            "hat": null,
+            "shirt": null,
+            "pants": null,
+            "shoes": null,
+            "hand_left": null,
+            "hand_right": null
+        },
+        "steps": 2537,
+        "created_at": "2025-04-27T17:47:41.145000"
+    },
+    {
+        "_id": "680e6dbd275cf61f38f656ef",
+        "username": "CircuitBreaker",
+        "login_id": "680e6dbd275cf61f38f656ee",
+        "password": "testpassword",
+        "recycle_coins": 36,
+        "trash_coins": 458,
+        "waste_coins": 312,
+        "accessories": {
+            "hat": null,
+            "shirt": null,
+            "pants": null,
+            "shoes": null,
+            "hand_left": null,
+            "hand_right": null
+        },
+        "steps": 6435,
+        "created_at": "2025-04-27T17:47:41.490000"
+    },
+    {
+        "_id": "680e6dbd275cf61f38f656f1",
+        "username": "ThunderBolt",
+        "login_id": "680e6dbd275cf61f38f656f0",
+        "password": "testpassword",
+        "recycle_coins": 470,
+        "trash_coins": 372,
+        "waste_coins": 459,
+        "accessories": {
+            "hat": null,
+            "shirt": null,
+            "pants": null,
+            "shoes": null,
+            "hand_left": null,
+            "hand_right": null
+        },
+        "steps": 9594,
+        "created_at": "2025-04-27T17:47:41.822000"
+    },
+    {
+        "_id": "680e6dbe275cf61f38f656f3",
+        "username": "QuantumKid",
+        "login_id": "680e6dbe275cf61f38f656f2",
+        "password": "testpassword",
+        "recycle_coins": 15,
+        "trash_coins": 6,
+        "waste_coins": 119,
+        "accessories": {
+            "hat": null,
+            "shirt": null,
+            "pants": null,
+            "shoes": null,
+            "hand_left": null,
+            "hand_right": null
+        },
+        "steps": 2066,
+        "created_at": "2025-04-27T17:47:42.129000"
+    },
+    {
+        "_id": "680e6ddaaec7d76a715479f3",
+        "username": "l1qd19bip8",
+        "login_id": "680e6ddaaec7d76a715479f2",
+        "recycle_coins": 0,
+        "trash_coins": 0,
+        "waste_coins": 0,
+        "accessories": {
+            "hat": null,
+            "shirt": null,
+            "pants": null,
+            "shoes": null,
+            "hand_left": null,
+            "hand_right": null
+        },
+        "steps": 0,
+        "created_at": "2025-04-27T17:48:10.518000"
+    },
+    {
+        "_id": "680e6ddaaec7d76a715479f5",
+        "username": "8puve4vxwp",
+        "login_id": "680e6ddaaec7d76a715479f4",
+        "recycle_coins": 100,
+        "trash_coins": 210,
+        "waste_coins": 50,
+        "accessories": {
+            "hat": null,
+            "shirt": null,
+            "pants": null,
+            "shoes": null,
+            "hand_left": null,
+            "hand_right": null
+        },
+        "steps": 5000,
+        "created_at": "2025-04-27T17:48:10.748000"
+    },
+    {
+        "_id": "680e6defaec7d76a715479f7",
+        "username": "5husyflofm",
+        "login_id": "680e6defaec7d76a715479f6",
+        "recycle_coins": 0,
+        "trash_coins": 0,
+        "waste_coins": 0,
+        "accessories": {
+            "hat": null,
+            "shirt": null,
+            "pants": null,
+            "shoes": null,
+            "hand_left": null,
+            "hand_right": null
+        },
+        "steps": 0,
+        "created_at": "2025-04-27T17:48:31.936000"
+    },
+    {
+        "_id": "680e6df0aec7d76a715479f9",
+        "username": "5e8pdsbsp1",
+        "login_id": "680e6df0aec7d76a715479f8",
+        "recycle_coins": 100,
+        "trash_coins": 210,
+        "waste_coins": 50,
+        "accessories": {
+            "hat": null,
+            "shirt": null,
+            "pants": null,
+            "shoes": null,
+            "hand_left": null,
+            "hand_right": null
+        },
+        "steps": 5000,
+        "created_at": "2025-04-27T17:48:32.276000"
     }
 ]

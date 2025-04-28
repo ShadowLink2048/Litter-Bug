@@ -1,144 +1,154 @@
 
-# 🗑️ Litter-Bug Database Setup and API
+# 🪰 Litter-Bug: Clean the World, One Piece at a Time 🌍
 
-**Litter-Bug** is a mobile application inspired by Pokémon GO, designed to encourage users to collect and properly dispose of litter. This backend API server supports user management, trash collection tracking, bin interaction, and leaderboards.
+**Litter-Bug** is an interactive, geolocation-based environmental cleanup game that encourages users to collect and properly dispose of litter in real life. Designed as part of the **UW 2025 Hackathon "Save the World"** project, Litter-Bug combines the excitement of gaming with social good, offering leaderboards, achievements, and real-time communication to foster community-driven cleanup efforts.
 
----
+## 📖 Table of Contents
+
+1. [Project Overview](#project-overview)  
+2. [Project Structure](#project-structure)  
+3. [Frontend Overview](#frontend-overview)  
+4. [Backend Overview](#backend-overview)  
+5. [Setup Instructions](#setup-instructions)  
+6. [API Documentation](#api-documentation)  
+7. [Roadmap and Future Plans](#roadmap-and-future-plans)  
+8. [License](#license)  
+9. [Authors](#authors)
+
+## 🏗️ Project Overview
+
+Litter-Bug is structured as a **multi-service full-stack application**, including:
+
+- **React Frontend (SPA)** with interactive maps and user profiles  
+- **Python Flask REST APIs** for account management, trash/bin reporting, and real-time chat services  
+- **MongoDB Backend** for geospatial data storage and user progress tracking  
+
+The game rewards users with coins for proper waste disposal and allows social engagement through chat and leaderboards.
 
 ## 📂 Project Structure
 
 ```
 Litter-Bug/
-├── database_py_files/
-│   ├── api_server.py         # Main Flask API server with user auth, trash collection, bin interaction
-│   ├── db_setup.py           # Sets up MongoDB collections and schema validation
-│   ├── db_utils.py           # Utility functions for inserting users, bins, trash
-│   ├── test_insert_users.py  # Test script to insert showcase-ready test users
-├── public/                   # Static assets
-├── src/                      # Source code for the app frontend
-├── README.md                 # This documentation file
+├── litter-bug-react/        # React frontend (game UI)
+│   ├── public/              # Static assets
+│   ├── src/                 # Main React source code
+├── account-api/             # User account management API (Flask)
+├── chatserver-api/          # Real-time chat functionality API (Flask)
+├── garbage-api/             # Trash and bin management API (Flask)
+├── database_py_files/       # MongoDB setup and shared utilities
+├── testing/                 # Scripts for generating test data (users, scores)
+├── requirements.txt         # Python backend dependencies
+├── .gitignore               # Ignored files for Git version control
+├── LICENSE                  # MIT License
+└── README.md                # Full project documentation (this file)
 ```
 
----
+## 🎨 Frontend Overview
 
-## ⚙️ Database: MongoDB Structure
+### Technologies:
+- **React**
+- **React Router**
+- **Axios**
+- **Leaflet**
 
-### Database Name:
-```
-litterbug_db
-```
+### Core Features:
+- User Authentication
+- Interactive Map
+- Trash Collection Reporting
+- Leaderboard
+- Real-Time Chat
 
-### Collections and Schemas:
+### Frontend Setup Instructions:
 
-#### 🟢 Users Collection
-- Fields:
-  - `username`: string (unique)
-  - `password`: string (hashed)
-  - `recycle_coins`: int
-  - `trash_coins`: int
-  - `waste_coins`: int (walk coins)
-  - `equipment`: object
-    - `hat`, `shirt`, `pants`, `shoes`, `hand_left`, `hand_right`: string or null
-  - `steps`: int
-  - `created_at`: datetime
-
-#### 🟡 Bins Collection
-- Fields:
-  - `longitude`: float
-  - `latitude`: float
-  - `type`: "trash" or "recycle"
-
-#### 🔴 Trash Collection
-- Fields:
-  - `longitude`: float
-  - `latitude`: float
-  - `type`: "trash" or "recycle"
-  - `dropped_by`: string (optional)
-  - `picked_up_by`: string (optional)
-  - `is_collected`: bool
-  - `timestamp`: datetime
-
----
-
-## 🌐 API Endpoints Overview
-
-### Authentication and User Management
-- **POST /signup** — User registration with password hashing.
-- **POST /login** — Login with bcrypt password checking, returns token.
-- **POST /userinfo** — Token validation, fetch user info.
-- **PATCH /api/users/update/<username>** — Update user coins, steps, or equipment (requires token).
-
-### Trash and Bin Management
-- **POST /api/bins/add** — Add a new bin (requires token).
-- **POST /api/trash/add** — Add a new trash item (requires token).
-- **POST /api/trash/collect** — Mark trash as collected, assign to a user, award trash coins (requires token).
-
-### Location Queries
-- **POST /api/bins/nearby** — Get nearby bins based on coordinates and radius.
-- **POST /api/trash/nearby** — Get nearby trash items.
-
-### Leaderboard
-- **GET /api/users/top-trash-scores** — Returns Top 10 users ranked by trash token score.
-
----
-
-## 🏗️ Example Payloads
-
-### Signup Example:
-```json
-{
-  "username": "EcoWarrior",
-  "passkey": "securepassword123",
-  "email": "eco@example.com",
-  "firstname": "Eco",
-  "lastname": "Warrior"
-}
+```bash
+cd litter-bug-react
+npm install
+npm start
 ```
 
-### Login Example:
-```json
-{
-  "username": "EcoWarrior",
-  "passkey": "securepassword123"
-}
+## 🧩 Backend Overview
+
+### Technologies:
+- **Python 3**
+- **Flask**
+- **MongoDB**
+- **bcrypt**
+
+### Backend Components:
+1. **account-api/**
+2. **chatserver-api/**
+3. **garbage-api/**
+4. **database_py_files/**
+
+## 🚀 Setup Instructions (Full Stack)
+
+### 1. Clone the Repository:
+```bash
+git clone https://github.com/WaaaaayTwoManyHats/Litter-Bug.git
+cd Litter-Bug
 ```
 
-### Update User Example:
-```json
-{
-  "tokenid": "your_user_token_here",
-  "recycle_coins": 10,
-  "waste_coins": 5,
-  "steps": 1000
-}
+### 2. Backend Setup
+```bash
+python -m venv venv
+source venv/bin/activate  # Windows: venv\Scripts\activate
+pip install -r requirements.txt
+```
+Ensure MongoDB is running and start each service:
+```bash
+python server.py
 ```
 
----
+### 3. Frontend Setup
+```bash
+cd litter-bug-react
+npm install
+npm start
+```
 
-## 🧪 Running the Project
+## 📡 API Documentation
 
-1. Ensure MongoDB is running (`localhost:27017`).
-2. Run `db_setup.py` to create your collections and apply schema validation:
-   ```bash
-   python db_setup.py
-   ```
-3. (Optional) Insert test users:
-   ```bash
-   python test_insert_users.py
-   ```
-4. Start your Flask API server:
-   ```bash
-   python api_server.py
-   ```
-5. Access the leaderboard or other endpoints via `http://localhost:5000`.
+### Authentication (Account API)
+| Endpoint               | Method | Description                   |
+|------------------------|--------|-------------------------------|
+| `/api/signup`          | POST   | Create a new user             |
+| `/api/login`           | POST   | Login and receive token       |
+| `/api/user/<username>` | GET    | Fetch user profile (token)    |
 
----
+### Trash and Bin Reporting (Garbage API)
+| Endpoint                   | Method | Description                           |
+|----------------------------|--------|---------------------------------------|
+| `/api/bins/add`             | POST   | Add a new bin                        |
+| `/api/trash/add`            | POST   | Report trash                         |
+| `/api/bins/nearby`          | GET    | Get bins within a radius             |
+| `/api/trash/nearby`         | GET    | Get trash within a radius            |
+
+### Chat Server API
+| Endpoint            | Method | Description                |
+|---------------------|--------|----------------------------|
+| `/api/chat/send`    | POST   | Send a message             |
+| `/api/chat/history` | GET    | Retrieve chat history      |
+
+## 🏆 Roadmap and Future Plans
+
+- ✅ Basic account signup/login
+- ✅ Trash and bin reporting
+- ✅ Interactive map
+- 🟡 WebSockets for chat
+- 🟡 Gamification (avatars, badges)
+- 🟡 Photo metadata integration
+- 🟡 Mobile app development
 
 ## 📄 License
 
-This project is licensed under the [MIT License](LICENSE).
+MIT License
 
----
+```
+MIT License
+
+Permission is hereby granted, free of charge...
+(license text omitted here for brevity)
+```
 
 ## 👥 Authors
 
@@ -148,4 +158,4 @@ This project is licensed under the [MIT License](LICENSE).
 - Morgan  
 - Bryan Harris  
 
-> Special thanks to the team for their contributions to the UW 2025 Hackathon "Save the World" project.
+Special thanks to the team for their contributions to the **UW 2025 Hackathon "Save the World"** project.
