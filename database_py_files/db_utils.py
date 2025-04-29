@@ -1,21 +1,32 @@
+from bson import ObjectId
 from pymongo import MongoClient
 from pymongo.errors import DuplicateKeyError
 import json
 import datetime
 
-# MongoDB connection
-client = MongoClient("mongodb://localhost:27017/")
-db = client["litter_bug_db"]
+# MongoDB setup
+client = MongoClient('mongodb://localhost:27017/')
+db = client['litter_bug_db']
+users_collection = db['Users']
 
-# 🟢 Custom JSON Encoder to handle datetime objects
+
+# Custom JSON Encoder to handle ObjectId and datetime serialization
 class MongoJSONEncoder(json.JSONEncoder):
     def default(self, obj):
-        if isinstance(obj, datetime.datetime):
-            return obj.isoformat()  # Convert datetime to ISO 8601 string
+        if isinstance(obj, ObjectId):
+            return str(obj)  # Convert ObjectId to string
+        elif isinstance(obj, datetime.datetime):
+            return obj.isoformat()  # Convert datetime to ISO format string
         return super().default(obj)
+
 
 # 🟠 Insert a new user into the litter_bug_db Users collection
 def insert_user(username):
+    # Check if the username already exists
+    if db.Users.find_one({"username": username}):
+        print(f"⚠️ Username '{username}' already exists. Choose a different username.")
+        return
+
     user_doc = {
         "username": username,
         "recycle_coins": 0,
@@ -30,7 +41,7 @@ def insert_user(username):
             "hand_right": None
         },
         "steps": 0,
-        "created_at": datetime.datetime.now(datetime.UTC)  # Timezone-aware datetime
+        "created_at": datetime.datetime.now(datetime.timezone.utc)  # Timezone-aware datetime
     }
 
     try:
@@ -39,23 +50,30 @@ def insert_user(username):
     except DuplicateKeyError:
         print(f"⚠️ Username '{username}' already exists. Choose a different username.")
 
+
 # 🟣 Retrieve all users from the Users collection
 def get_all_users():
     users_cursor = db.Users.find()
     users_list = []
     for user in users_cursor:
         user["_id"] = str(user["_id"])  # Convert ObjectId to string for JSON safety
+
+        # Ensure created_at exists before accessing it
+        if "created_at" in user:
+            user["created_at"] = user["created_at"].isoformat()  # Ensure datetime is converted
+        else:
+            user["created_at"] = None  # Or assign a default value (e.g., None)
+
         users_list.append(user)
     return users_list
 
-# 🟡 Export all users to a JSON file (fixed datetime issue)
-def export_users_to_json(filepath="users_export.json"):
-    users = get_all_users()
 
-    with open(filepath, "w") as f:
-        json.dump(users, f, indent=4, cls=MongoJSONEncoder)
+# Function to export users to JSON
+def export_users_to_json():
+    users = get_all_users()  # Retrieve all users
+    with open('users_export.json', 'w') as f:
+        json.dump(users, f, indent=4, cls=MongoJSONEncoder)  # Use custom encoder
 
-    print(f"✅ All users exported to {filepath}")
 
 # Optional: manual test to export users
 if __name__ == "__main__":

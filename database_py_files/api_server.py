@@ -1,4 +1,3 @@
-# api_server.py (inside database_py_files)
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 from db_utils import export_users_to_json
@@ -6,66 +5,46 @@ from geo_utils import get_bins_within_radius, get_trash_within_radius
 from login_utils_db import get_user_profile, game_db
 from login_utils_db import hash_passkey, check_hash_match, add_logged_in_user, logged_in, collection
 from pymongo import MongoClient
-from bson import ObjectId
-from math import radians, cos, sin, sqrt, atan2
+from bson import ObjectId, json_util  # Import json_util from bson
+import subprocess
+import os
 import bcrypt
 import datetime
+import json
 
+# Flask setup
 app = Flask(__name__)
 CORS(app)
 
+# MongoDB setup
 client = MongoClient('mongodb://localhost:27017/')
 db = client['litter_bug_db']
 users_collection = db['Users']
 trash_collection = db['Trash']
 bins_collection = db['Bins']
 
+# Flag to check DB setup
 DB_SETUP_FLAG = "DB_SETUP_COMPLETE.flag"
 
-import subprocess
-import sys
-import os
-
-
+# Database setup function
 def run_db_setup():
     try:
         print("🔧 Running database setup script...")
-
-        # Check for the correct Python command based on the platform
-        python_command = "python3" if sys.platform != "win32" else "python"
-
-        # Log the command being run
-        print(f"Running command: {python_command} setup_all.py")
-
-        # Run the setup script
-        result = subprocess.run([python_command, "setup_all.py"], check=True)
-
-        # Log the return code of the subprocess to see if it's successful
-        print(f"Subprocess result code: {result.returncode}")
-
-        if result.returncode == 0:
-            print("✅ Database setup script ran successfully.")
-        else:
-            print(f"⚠️ Database setup script returned non-zero exit code: {result.returncode}")
-
-        # Create the flag file
+        subprocess.run(["python", "setup_all.py"], check=True)
         with open(DB_SETUP_FLAG, "w") as flag_file:
             flag_file.write("Database setup completed.")
-            print(f"✅ Flag file '{DB_SETUP_FLAG}' created successfully.")
-
+        print("✅ Database setup completed successfully.")
     except subprocess.CalledProcessError as e:
         print("❌ Database setup failed:", e)
-    except FileNotFoundError as e:
-        print("❌ Python is not installed or cannot be found:", e)
-    except PermissionError as e:
-        print(f"❌ Permission error: {e}")
-    except Exception as e:
-        print(f"❌ An unexpected error occurred: {e}")
-
 
 if not os.path.exists(DB_SETUP_FLAG):
     run_db_setup()
 
+# Helper function to serialize MongoDB data (using bson.json_util)
+def serialize_mongo_data(data):
+    return json.loads(json_util.dumps(data))
+
+# API routes
 @app.route('/', methods=['GET'])
 def index():
     return jsonify({'message': 'Litter-Bug API is running!'}), 200
@@ -75,12 +54,12 @@ def index():
 # -----------------------------
 @app.route('/api/profile', methods=['POST'])
 def create_or_get_profile():
-    data = request.get_json()
-    username = data.get('username')
-    if not username:
-        return jsonify({'error': 'Missing username'}), 400
+    username = request.json.get('username')
     profile = get_user_profile(username)
+
     if profile:
+        # Use bson.json_util to properly serialize ObjectId
+        profile = serialize_mongo_data(profile)
         return jsonify({'profile': profile}), 200
     else:
         return jsonify({'error': 'User not found in login_db'}), 404
@@ -99,48 +78,14 @@ def get_user_by_id():
     try:
         user = users_collection.find_one({'_id': ObjectId(user_id)})
         if user:
-            user['_id'] = str(user['_id'])
-            user.pop('passkey', None)
+            # Convert ObjectId to string using bson.json_util
+            user = serialize_mongo_data(user)
+            user.pop('passkey', None)  # Remove sensitive info like passkey
             return jsonify({'user': user}), 200
         else:
             return jsonify({'error': 'User not found'}), 404
     except Exception as e:
         return jsonify({'error': f'Invalid ID format or server error: {str(e)}'}), 500
-
-# -----------------------------
-# EXPORT USERS TO JSON
-# -----------------------------
-@app.route('/api/users/export', methods=['GET'])
-def export_users():
-    try:
-        export_users_to_json()
-        return jsonify({'success': 'Users exported to users_export.json'}), 200
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
-
-# -----------------------------
-# GET NEARBY BINS
-# -----------------------------
-@app.route('/api/bins/nearby', methods=['POST'])
-def get_nearby_bins():
-    data = request.get_json()
-    lon, lat, radius = data.get('longitude'), data.get('latitude'), data.get('radius')
-    if None in (lon, lat, radius):
-        return jsonify({'error': 'Missing longitude, latitude, or radius'}), 400
-    bins = get_bins_within_radius(lon, lat, radius)
-    return jsonify({'bins': bins}), 200
-
-# -----------------------------
-# GET NEARBY TRASH
-# -----------------------------
-@app.route('/api/trash/nearby', methods=['POST'])
-def get_nearby_trash():
-    data = request.get_json()
-    lon, lat, radius = data.get('longitude'), data.get('latitude'), data.get('radius')
-    if None in (lon, lat, radius):
-        return jsonify({'error': 'Missing longitude, latitude, or radius'}), 400
-    trash = get_trash_within_radius(lon, lat, radius)
-    return jsonify({'trash': trash}), 200
 
 # -----------------------------
 # SIGNUP (USER REGISTRATION)
@@ -193,9 +138,9 @@ def signup():
         "steps": 0,
         "created_at": datetime.datetime.now(datetime.timezone.utc)
     }
-    users_collection.insert_one(new_game_user)  # Insert into game DB
+    game_result = users_collection.insert_one(new_game_user)  # Insert into game DB
 
-    return jsonify({'success': f"{username} must now log in"}), 201
+    return jsonify({'success': f"{username} must now log in", 'user_id': str(game_result.inserted_id)}), 201
 
 
 # -----------------------------
@@ -284,6 +229,3 @@ def get_top_trash_scores():
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
-
-#score board info
-#http://localhost:5000/api/users/top-trash-scores
