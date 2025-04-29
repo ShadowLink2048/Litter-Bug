@@ -4,25 +4,10 @@ import './GarbagePhoto.css';
 
 function GarbagePhotoPage() {
     const { setCurrentPage } = usePage();
-    const [image, setImage] = useState(null);
-    const [isModalOpen, setIsModalOpen] = useState(true); // Modal opens by default for upload
-    const [playerId, setPlayerId] = useState('12345'); // Example player ID, replace with actual logic
+    const [image, setImage] = useState();
+    const [isModalOpen, setIsModalOpen] = useState();
+    const [playerId, setPlayerId] = useState(); 
 
-    // Handle photo upload from file input
-    const handleUploadPhoto = (event) => {
-        const file = event.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                setImage(reader.result); // Store the uploaded image
-                setIsModalOpen(false); // Close the modal
-                sendPhotoToServer(file); // Immediately send the uploaded file
-            };
-            reader.readAsDataURL(file);
-        }
-    };
-
-    // Send the image to the server (grabbing garbage)
     const sendPhotoToServer = async (imageFile) => {
         if (!imageFile) {
             alert('Please upload an image first!');
@@ -31,12 +16,12 @@ function GarbagePhotoPage() {
 
         // Prepare data to send to the server
         const formData = new FormData();
-        formData.append('image', imageFile);
-        formData.append('id', playerId); // Add player ID (or any other argument you need)
-
+        formData.image = imageFile;
+        formData.id = playerId; 
+        
         try {
-            const response = await fetch('http://localhost:2001/grabgarbage', {
-                method: 'POST',
+            const response = await fetch('http://localhost:2434/garbagethrow', {
+                methods: 'POST',
                 body: formData
             });
             const responseData = await response.json();
@@ -86,8 +71,8 @@ function GarbagePhotoPage() {
 
             {/* Modal for Uploading a Photo */}
             {isModalOpen && (
-                <div className="modal">
-                    <div className="modal-content">
+                <div className="model">
+                    <div className="model-content">
                         <h3>Please Upload a Photo</h3>
                         <input type="file" accept="image/*" onChange={handleUploadPhoto} />
                     </div>
