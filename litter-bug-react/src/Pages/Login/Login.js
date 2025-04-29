@@ -24,11 +24,18 @@ function LoginPage() {
   };
 
   return (
+<<<<<<< HEAD
     <div class="login-page">
       <div class="logo">Litter-Bug.ai</div>
 
       <div class="login-box">
         <img src="animation.gif" alt="Login gif" style={{ width: 200, height: 150 }} />
+=======
+    <div className="login-page">
+      <div className="logo">Litter Bug</div>
+      
+      <div className="login-box">
+>>>>>>> parent of 3ad9bf8 (added story to login page)
         <h2>Log In</h2>
         <input
           type="text"
