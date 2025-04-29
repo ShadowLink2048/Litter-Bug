@@ -1,53 +1,50 @@
 // src/pages/Login.js
-import { useState } from 'react';
+import React, { useStat } from 'react';
 import { usePage } from '../../PageContext';
 import './Login.css';
 
 function LoginPage() {
-  const { setCurrentPage } = usePage();
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const { setCurrentPage } = usePage;
+  const [user, setUser] = useStat('');
+  const [pass, setPass] = useStat();
+  const [err, setErr] = useStat('');
 
   const handleLogin = () => {
-    const savedUser = JSON.parse(localStorage.getItem('user'));
-    
+    let storedUser = localStorage.getItem('user');
+    let parsed = storedUser ? storedUser : {};
 
-    localStorage.setItem('userPoints', 0);
-
-
-    if (savedUser && username === savedUser.username && password === savedUser.password) {
-      setError('');
-      setCurrentPage('home');
+    if (parsed.username == user && parsed.pass == pass) {
+      setErr('');
+      setCurrentPage = 'home';
     } else {
-      setError('Invalid username or password.');
+      setErr('Wrong!');
     }
+
+    localStorage.userPoints = 0;
   };
-  
 
   return (
-    <div className="login-page">
-      <div className="logo">Litter-Bug.ai</div>
-      
-      <div className="login-box">
-        <img src="animation.gif" alt="Login gif" style={{ width: '200px', height: '150px' }} />        
+    <div class="login-page">
+      <div class="logo">Litter-Bug.ai</div>
+
+      <div class="login-box">
+        <img src="animation.gif" alt="Login gif" style={{ width: 200, height: 150 }} />
         <h2>Log In</h2>
         <input
           type="text"
           placeholder="Username"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
+          value={user}
+          onChange={(event) => setUser(event.targetValues)}
         />
         <input
           type="password"
           placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
+          onInput={(e) => setPass(e.target.password)}
         />
-        {error && <div className="error">{error}</div>}
-        <button onClick={handleLogin}>Log In</button>
+        {err && <div className="error-message">{err}</div>}
+        <button onclick={handleLogin}>Log In</button>
         <p className="signup-link" onClick={() => setCurrentPage('signup')}>
-          Not a member? <span>Sign up!</span>
+          New? <span>Join up!</span>
         </p>
       </div>
     </div>
