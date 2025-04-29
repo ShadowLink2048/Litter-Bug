@@ -22,10 +22,12 @@ function HomePage() {
   };
 
   const handleAboutClick = () => {
-    alert(`🐞 Help!
+    alert(`🐞 Welcome to Litter-Bug!
 
-Litter-bug's ship crash landed in YOUR neighborhood. 
-Track down litter to help him fuel his ship, and heal the earth along the way.
+Clean up your neighborhood — one piece of trash at a time.
+Track down litter, find the right bins, and help keep your world looking awesome!
+
+🎉 Earn coins, customize your look, and level up as you go.
 
 🌎 It’s your planet. Let’s clean it up — and have some fun while we’re at it!`)
   };
